@@ -1,0 +1,300 @@
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    padding-block: 14px;
+    padding-inline: 24px;
+    background-color: #033355;
+    color: #fff;
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+nav span {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+main {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-block: 24px;
+    padding-inline: 20px;
+}
+
+header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-block-end: 24px;
+}
+
+header h1 {
+    font-size: 1.4rem;
+    color: #1a1a2e;
+    margin-inline-end: auto;
+}
+
+header input[type="number"] {
+    padding-block: 8px;
+    padding-inline: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    inline-size: 200px;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+}
+
+header input[type="number"]::-webkit-inner-spin-button,
+header input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+header input[type="number"]:focus {
+    outline: none;
+    border-color: #033355;
+    box-shadow: 0 0 0 3px rgba(3, 51, 85, 0.1);
+}
+
+header button {
+    padding-block: 10px;
+    padding-inline: 20px;
+    background-color: #033355;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+header button:hover {
+    background-color: #3a56d4;
+}
+
+#appointments-table-section {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    overflow-x: auto;
+    padding-block: 16px;
+    padding-inline: 16px;
+}
+
+table {
+    inline-size: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f8f9fa;
+}
+
+th {
+    padding-block: 12px;
+    padding-inline: 16px;
+    text-align: start;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-block-end: 2px solid #e9ecef;
+}
+
+td {
+    padding-block: 12px;
+    padding-inline: 16px;
+    font-size: 0.9rem;
+    border-block-end: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-badge {
+    display: inline-block;
+    padding-block: 3px;
+    padding-inline: 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-pending    { background-color: #fff3cd; color: #856404; }
+.status-confirmed  { background-color: #cce5ff; color: #004085; }
+.status-completed  { background-color: #d4edda; color: #155724; }
+.status-cancelled  { background-color: #f8d7da; color: #721c24; }
+
+td button {
+    padding-block: 6px;
+    padding-inline: 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-inline-end: 6px;
+    transition: background-color 0.2s;
+}
+
+td button.edit-btn {
+    background-color: #f0ad4e;
+    color: #fff;
+}
+
+td button.edit-btn:hover {
+    background-color: #ec971f;
+}
+
+td button.delete-btn {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+td button.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+td.actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+#no-appointments-msg {
+    text-align: center;
+    color: #888;
+    padding-block: 40px;
+    font-size: 1rem;
+    display: none;
+}
+
+#form-section {
+    display: none;
+    background-color: #fff;
+    border-radius: 12px;
+    padding-block: 32px;
+    padding-inline: 32px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    max-inline-size: 700px;
+    margin-inline: auto;
+    margin-block-start: 24px;
+}
+
+#form-section h2 {
+    margin-block-end: 20px;
+    font-size: 1.3rem;
+    color: #1a1a2e;
+}
+
+fieldset {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding-block: 20px;
+    padding-inline: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+legend {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #555;
+    padding-inline: 8px;
+}
+
+fieldset > div {
+    flex: 1 1 calc(50% - 8px);
+    min-inline-size: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+fieldset label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+fieldset input,
+fieldset select,
+fieldset textarea {
+    padding-block: 10px;
+    padding-inline: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+fieldset input:focus,
+fieldset select:focus,
+fieldset textarea:focus {
+    outline: none;
+    border-color: #033355;
+    box-shadow: 0 0 0 3px rgba(3, 51, 85, 0.1);
+}
+
+fieldset textarea {
+    resize: vertical;
+    min-block-size: 60px;
+}
+
+menu {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    margin-block-start: 20px;
+    padding: 0;
+}
+
+menu button {
+    padding-block: 10px;
+    padding-inline: 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#submit-btn {
+    background-color: #033355;
+    color: #fff;
+}
+
+#submit-btn:hover {
+    background-color: #3a56d4;
+}
+
+#cancel-btn {
+    background-color: #6c757d;
+}   

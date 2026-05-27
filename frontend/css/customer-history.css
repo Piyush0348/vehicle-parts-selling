@@ -1,0 +1,424 @@
+/* reset */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* base */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* nav */
+nav {
+    display: flex;
+    align-items: center;
+    padding-block: 14px;
+    padding-inline: 24px;
+    background-color: #033355;
+    color: #fff;
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+nav span {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* main */
+main {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-block: 24px;
+    padding-inline: 20px;
+}
+
+/* header */
+header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-block-end: 24px;
+}
+
+header h1 {
+    font-size: 1.4rem;
+    color: #1a1a2e;
+    margin-inline-end: auto;
+}
+
+header input[type="number"] {
+    padding-block: 8px;
+    padding-inline: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    inline-size: 200px;
+    transition: border-color 0.2s;
+    /* hide number spinners */
+    -moz-appearance: textfield;
+}
+
+header input[type="number"]::-webkit-inner-spin-button,
+header input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+header input[type="number"]:focus {
+    outline: none;
+    border-color: #033355;
+    box-shadow: 0 0 0 3px rgba(3, 51, 85, 0.1);
+}
+
+header button {
+    padding-block: 10px;
+    padding-inline: 20px;
+    background-color: #033355;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+header button:hover {
+    background-color: #3a56d4;
+}
+
+/* ── Customer info card ────────────────────────────────────────────────────── */
+#customer-info-section {
+    display: none;
+    margin-block-end: 20px;
+}
+
+#customer-info-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    padding-block: 20px;
+    padding-inline: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+#customer-avatar {
+    inline-size: 56px;
+    block-size: 56px;
+    border-radius: 50%;
+    background-color: #033355;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#customer-details {
+    flex: 1 1 180px;
+}
+
+#customer-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+#customer-email,
+#customer-phone {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* stats row */
+#stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-inline-start: auto;
+}
+
+.stat-box {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding-block: 10px;
+    padding-inline: 14px;
+    text-align: center;
+    min-inline-size: 90px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #033355;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-block-start: 2px;
+}
+
+/* ── Tab bar ───────────────────────────────────────────────────────────────── */
+#tab-bar {
+    display: none;
+    gap: 8px;
+    margin-block-end: 16px;
+}
+
+.tab-btn {
+    padding-block: 8px;
+    padding-inline: 20px;
+    border: 2px solid #033355;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #033355;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tab-btn.active {
+    background-color: #033355;
+    color: #fff;
+}
+
+.tab-btn:hover:not(.active) {
+    background-color: #e8eef5;
+}
+
+/* ── Table sections ────────────────────────────────────────────────────────── */
+#purchases-section,
+#vehicles-section,
+#order-detail-section {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    overflow-x: auto;
+    padding-block: 16px;
+    padding-inline: 16px;
+    display: none;
+}
+
+#order-detail-section h2 {
+    font-size: 1.1rem;
+    color: #1a1a2e;
+    margin-block-end: 14px;
+}
+
+table {
+    inline-size: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f8f9fa;
+}
+
+th {
+    padding-block: 12px;
+    padding-inline: 16px;
+    text-align: start;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-block-end: 2px solid #e9ecef;
+}
+
+td {
+    padding-block: 12px;
+    padding-inline: 16px;
+    font-size: 0.9rem;
+    border-block-end: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* status badges */
+.status-badge {
+    display: inline-block;
+    padding-block: 3px;
+    padding-inline: 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-paid     { background-color: #d4edda; color: #155724; }
+.status-pending  { background-color: #fff3cd; color: #856404; }
+.status-shipped  { background-color: #cce5ff; color: #004085; }
+.status-cancelled{ background-color: #f8d7da; color: #721c24; }
+.status-completed{ background-color: #d4edda; color: #155724; }
+.status-inprogress{ background-color: #cce5ff; color: #004085; }
+
+/* detail / back button in table rows */
+td button.detail-btn {
+    padding-block: 6px;
+    padding-inline: 12px;
+    background-color: #033355;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+td button.detail-btn:hover {
+    background-color: #3a56d4;
+}
+
+/* back button in order detail */
+#close-detail-btn {
+    display: inline-block;
+    margin-block-start: 16px;
+    padding-block: 8px;
+    padding-inline: 16px;
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#close-detail-btn:hover {
+    background-color: #5a6268;
+}
+
+/* "No items" messages */
+#no-purchases-msg,
+#no-vehicles-msg,
+#error-msg {
+    text-align: center;
+    padding-block: 40px;
+    font-size: 1rem;
+    display: none;
+}
+
+#no-purchases-msg,
+#no-vehicles-msg {
+    color: #888;
+}
+
+#error-msg {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+/* ── Vehicles panel ─────────────────────────────────────────────────────────── */
+#vehicle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.vehicle-card {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.vehicle-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-block: 14px;
+    padding-inline: 18px;
+    background-color: #f8f9fa;
+    border-block-end: 1px solid #e9ecef;
+}
+
+.vehicle-icon {
+    font-size: 1.5rem;
+}
+
+.vehicle-meta strong {
+    display: block;
+    font-size: 1rem;
+    color: #1a1a2e;
+}
+
+.vehicle-meta span {
+    font-size: 0.82rem;
+    color: #666;
+}
+
+.vehicle-card table {
+    margin: 0;
+}
+
+.vehicle-no-service {
+    text-align: center;
+    color: #aaa;
+    padding-block: 20px;
+    font-size: 0.9rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-inline-size: 768px) {
+    header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    header h1 {
+        margin-inline-end: 0;
+    }
+
+    header input[type="number"] {
+        inline-size: 100%;
+    }
+
+    #stats-row {
+        margin-inline-start: 0;
+        inline-size: 100%;
+    }
+
+    .stat-box {
+        flex: 1 1 calc(33% - 8px);
+    }
+}
+
+@media (max-inline-size: 480px) {
+    nav {
+        padding-inline: 16px;
+    }
+
+    main {
+        padding-inline: 12px;
+    }
+
+    th,
+    td {
+        padding-inline: 8px;
+        font-size: 0.8rem;
+    }
+}

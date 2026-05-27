@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - Create Sales Invoice</title>
+    <link rel="stylesheet" href="../css/staff-sales.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Staff Portal - Sales</span>
+    </nav>
+
+    <script type="module" src="../js/navbar.js"></script>
+
+    <main>
+        <div class="container">
+            <section class="sales-section">
+                <header>
+                    <h1>Create Sales Invoice</h1>
+                    <p class="subtitle">Register sales and generate invoices for customers</p>
+                </header>
+
+                <form id="salesForm">
+                    <!-- Customer Selection -->
+                    <section class="form-section">
+                        <h2>Customer Information</h2>
+                        
+                        <div class="form-group">
+                            <label for="customerId">Customer ID *</label>
+                            <div class="input-group">
+                                <input 
+                                    type="number" 
+                                    id="customerId" 
+                                    name="customerId" 
+                                    placeholder="Enter customer ID"
+                                    min="1"
+                                    required
+                                >
+                                <button type="button" id="searchCustomerBtn" class="btn-search">Search</button>
+                            </div>
+                            <span class="error-message"></span>
+                        </div>
+
+                        <!-- Customer Details Display -->
+                        <div id="customerDetailsDisplay" class="customer-details hidden">
+                            <div class="details-row">
+                                <div class="detail-item">
+                                    <label>Name</label>
+                                    <span id="displayName">—</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Email</label>
+                                    <span id="displayEmail">—</span>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Phone</label>
+                                    <span id="displayPhone">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sales Items Section -->
+                    <section class="form-section">
+                        <div class="section-header">
+                            <h2>Sales Items</h2>
+                            <button type="button" id="addItemBtn" class="btn-secondary">+ Add Item</button>
+                        </div>
+
+                        <div id="itemsContainer">
+                            <!-- Items will be added dynamically -->
+                        </div>
+
+                        <p id="noItemsMsg" class="info-message">No items added yet. Click "Add Item" to begin.</p>
+                    </section>
+
+                    <!-- Order Summary -->
+                    <section class="form-section">
+                        <h2>Order Summary</h2>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <label>Subtotal</label>
+                                <span id="summarySubtotal">Rs. 0.00</span>
+                            </div>
+                            <div class="summary-item">
+                                <label>Discount (10% if > Rs. 5000)</label>
+                                <span id="summaryDiscount">Rs. 0.00</span>
+                            </div>
+                            <div class="summary-item highlight">
+                                <label>Total Amount</label>
+                                <span id="summaryTotal">Rs. 0.00</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Form Actions -->
+                    <section class="form-actions">
+                        <button type="reset" class="btn-secondary">Clear Form</button>
+                        <button type="submit" class="btn-primary">Create Invoice</button>
+                    </section>
+                </form>
+            </section>
+
+            <!-- Recent Invoices -->
+            <section class="recent-invoices-section">
+                <h2>Recent Invoices</h2>
+                <table id="recentInvoicesTable">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Discount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentInvoicesTbody"></tbody>
+                </table>
+                <p id="noInvoicesMsg" class="no-data-msg">No invoices created yet.</p>
+            </section>
+        </div>
+
+        <!-- Invoice Details Modal -->
+        <dialog id="invoiceDialog">
+            <div class="dialog-content">
+                <div class="dialog-header">
+                    <h2>Invoice <span id="invoiceNumber"></span></h2>
+                    <button type="button" id="closeInvoiceDialog" class="close-btn">&times;</button>
+                </div>
+                <div id="invoiceContent">
+                    <!-- Will be populated dynamically -->
+                </div>
+                <menu>
+                    <button id="printInvoiceBtn" type="button" class="btn-primary">Print</button>
+                    <button id="downloadInvoiceBtn" type="button" class="btn-secondary">Download HTML/Receipt</button>
+                    <button type="button" id="closeInvoiceBtn">Close</button>
+                </menu>
+            </div>
+        </dialog>
+
+        <!-- Alert Messages -->
+        <div id="alertMessage" class="alert hidden"></div>
+    </main>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner hidden"></div>
+
+    <script src="../js/staff-sales.js"></script>
+</body>
+</html>

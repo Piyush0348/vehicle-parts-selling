@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer - Service Reviews</title>
+    <link rel="stylesheet" href="../css/reviews.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Customer Portal</span>
+    </nav>
+
+    <main>
+        <header>
+            <h1>Service Reviews</h1>
+            <input
+                type="number"
+                id="customer-id-input"
+                placeholder="Enter Your Customer ID"
+                min="1"
+            >
+            <button id="load-btn" type="button">Load</button>
+            <button id="open-form-btn" type="button">Write Review</button>
+        </header>
+
+        <p id="error-msg"></p>
+
+        <section id="form-section">
+            <h2 id="form-heading">Write a Review</h2>
+            <form id="review-form">
+                <input type="hidden" id="review-id" value="">
+
+                <fieldset>
+                    <legend>Your Review</legend>
+
+                    <div>
+                        <label for="rating">Rating</label>
+                        <div id="star-rating">
+                            <button type="button" class="star-btn" data-value="1">&#9733;</button>
+                            <button type="button" class="star-btn" data-value="2">&#9733;</button>
+                            <button type="button" class="star-btn" data-value="3">&#9733;</button>
+                            <button type="button" class="star-btn" data-value="4">&#9733;</button>
+                            <button type="button" class="star-btn" data-value="5">&#9733;</button>
+                        </div>
+                        <input type="hidden" id="rating-value" value="0">
+                    </div>
+
+                    <div>
+                        <label for="review-comment">Comment</label>
+                        <textarea id="review-comment" rows="4" placeholder="Share your experience with our service"></textarea>
+                    </div>
+                </fieldset>
+
+                <menu>
+                    <button type="submit" id="submit-btn">Submit Review</button>
+                    <button type="button" id="cancel-btn">Cancel</button>
+                </menu>
+            </form>
+        </section>
+
+        <section id="all-reviews-section">
+            <h2>All Customer Reviews</h2>
+            <div id="reviews-summary">
+                <span id="avg-rating">0.0</span>
+                <span id="avg-stars"></span>
+                <span id="total-reviews">0 reviews</span>
+            </div>
+            <div id="reviews-list"></div>
+            <p id="no-reviews-msg">No reviews yet. Be the first to leave a review.</p>
+        </section>
+
+        <dialog id="confirm-dialog">
+            <p>Are you sure you want to delete this review?</p>
+            <menu>
+                <button id="confirm-yes" type="button">Yes, Delete</button>
+                <button id="confirm-no" type="button">Go Back</button>
+            </menu>
+        </dialog>
+    </main>
+
+    <script src="../js/reviews.js"></script>
+</body>
+</html>

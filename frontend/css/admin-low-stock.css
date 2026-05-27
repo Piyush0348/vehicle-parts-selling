@@ -1,0 +1,323 @@
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    padding-block: 14px;
+    padding-inline: 24px;
+    background-color: #033355;
+    color: #fff;
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+nav span {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+main {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-block: 24px;
+    padding-inline: 20px;
+}
+
+header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-block-end: 24px;
+}
+
+header h1 {
+    font-size: 1.4rem;
+    color: #1a1a2e;
+    margin-inline-end: auto;
+}
+
+header button {
+    padding-block: 10px;
+    padding-inline: 20px;
+    background-color: #033355;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+header button:hover {
+    background-color: #3a56d4;
+}
+
+#send-alert-btn {
+    background-color: #e74c3c;
+}
+
+#send-alert-btn:hover {
+    background-color: #c0392b;
+}
+
+#alert-banner {
+    background-color: #fff3cd;
+    border: 1px solid #f0ad4e;
+    border-radius: 8px;
+    padding-block: 14px;
+    padding-inline: 20px;
+    margin-block-end: 20px;
+    display: none;
+}
+
+#alert-banner p {
+    color: #856404;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+#stock-table-section,
+#overdue-section {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    overflow-x: auto;
+    padding-block: 16px;
+    padding-inline: 16px;
+    margin-block-end: 24px;
+}
+
+#overdue-section h2 {
+    font-size: 1.2rem;
+    color: #1a1a2e;
+    margin-block-end: 16px;
+}
+
+#overdue-actions {
+    margin-block-end: 16px;
+}
+
+#send-reminders-btn {
+    padding-block: 8px;
+    padding-inline: 16px;
+    background-color: #f0ad4e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#send-reminders-btn:hover {
+    background-color: #ec971f;
+}
+
+table {
+    inline-size: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f8f9fa;
+}
+
+th {
+    padding-block: 12px;
+    padding-inline: 16px;
+    text-align: start;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-block-end: 2px solid #e9ecef;
+}
+
+td {
+    padding-block: 12px;
+    padding-inline: 16px;
+    font-size: 0.9rem;
+    border-block-end: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.stock-critical {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+.stock-warning {
+    color: #f0ad4e;
+    font-weight: 700;
+}
+
+.overdue-severe {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+.overdue-moderate {
+    color: #f0ad4e;
+    font-weight: 600;
+}
+
+#no-stock-msg,
+#no-overdue-msg {
+    text-align: center;
+    color: #888;
+    padding-block: 40px;
+    font-size: 1rem;
+    display: none;
+}
+
+dialog {
+    border: none;
+    border-radius: 12px;
+    padding-block: 24px;
+    padding-inline: 32px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    max-inline-size: 420px;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+dialog h3 {
+    font-size: 1.1rem;
+    color: #1a1a2e;
+    margin-block-end: 16px;
+}
+
+#email-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-block-end: 20px;
+}
+
+#email-input-group label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+#email-input-group input {
+    padding-block: 10px;
+    padding-inline: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#email-input-group input:focus {
+    outline: none;
+    border-color: #033355;
+    box-shadow: 0 0 0 3px rgba(3, 51, 85, 0.1);
+}
+
+dialog menu {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    padding: 0;
+}
+
+dialog menu button {
+    padding-block: 10px;
+    padding-inline: 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#email-confirm {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+#email-confirm:hover {
+    background-color: #c0392b;
+}
+
+#email-cancel {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+#email-cancel:hover {
+    background-color: #5a6268;
+}
+
+#success-msg {
+    text-align: center;
+    padding-block: 16px;
+    font-size: 1rem;
+    color: #27ae60;
+    font-weight: 600;
+    display: none;
+}
+
+#error-msg {
+    text-align: center;
+    padding-block: 16px;
+    font-size: 1rem;
+    color: #e74c3c;
+    font-weight: 600;
+    display: none;
+}
+
+@media (max-inline-size: 768px) {
+    header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    header h1 {
+        margin-inline-end: 0;
+    }
+}
+
+@media (max-inline-size: 480px) {
+    nav {
+        padding-inline: 16px;
+    }
+
+    main {
+        padding-inline: 12px;
+    }
+
+    th,
+    td {
+        padding-inline: 8px;
+        font-size: 0.8rem;
+    }
+}

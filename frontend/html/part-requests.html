@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer - Request Unavailable Parts</title>
+    <link rel="stylesheet" href="../css/part-requests.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Customer Portal</span>
+    </nav>
+
+    <main>
+        <header>
+            <h1>Part Requests</h1>
+            <input
+                type="number"
+                id="customer-id-input"
+                placeholder="Filter by Customer ID"
+                min="1"
+            >
+            <button id="load-btn" type="button">Filter</button>
+            <button id="open-form-btn" type="button">Request Part</button>
+        </header>
+
+        <section id="requests-table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Part Name</th>
+                        <th>Part Number</th>
+                        <th>Vehicle</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Requested On</th>
+                        <th>Customer</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-tbody"></tbody>
+            </table>
+            <p id="no-requests-msg">No part requests found.</p>
+        </section>
+
+        <section id="form-section">
+            <h2 id="form-heading">Request Unavailable Part</h2>
+            <form id="request-form">
+                <input type="hidden" id="request-id" value="">
+
+                <fieldset>
+                    <legend>Part Details</legend>
+
+                    <div>
+                        <label for="part-name">Part Name</label>
+                        <input type="text" id="part-name" required placeholder="e.g. Brake Pad Set">
+                    </div>
+
+                    <div>
+                        <label for="part-number">Part Number (Optional)</label>
+                        <input type="text" id="part-number" placeholder="e.g. BP-2024-X">
+                    </div>
+
+                    <div>
+                        <label for="vehicle-select">Vehicle</label>
+                        <select id="vehicle-select" required>
+                            <option value="">Select vehicle</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="part-description">Description</label>
+                        <textarea id="part-description" rows="3" placeholder="Describe the part you need"></textarea>
+                    </div>
+                </fieldset>
+
+                <menu>
+                    <button type="submit" id="submit-btn">Submit Request</button>
+                    <button type="button" id="cancel-btn">Cancel</button>
+                </menu>
+            </form>
+        </section>
+
+        <dialog id="confirm-dialog">
+            <p>Are you sure you want to delete this request?</p>
+            <menu>
+                <button id="confirm-yes" type="button">Yes, Delete</button>
+                <button id="confirm-no" type="button">Go Back</button>
+            </menu>
+        </dialog>
+
+        <p id="error-msg"></p>
+    </main>
+
+    <script src="../js/part-requests.js"></script>
+</body>
+</html>

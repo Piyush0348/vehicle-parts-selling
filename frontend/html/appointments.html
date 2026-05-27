@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer - Book Appointment</title>
+    <link rel="stylesheet" href="../css/appointments.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Customer Portal</span>
+    </nav>
+
+    <main>
+        <header>
+            <h1>Service Appointments</h1>
+            <input
+                type="number"
+                id="customer-id-input"
+                placeholder="Enter Customer ID"
+                min="1"
+            >
+            <button id="load-btn" type="button">Load</button>
+            <button id="open-form-btn" type="button">Book Appointment</button>
+        </header>
+
+        <p id="error-msg"></p>
+
+        <section id="form-section">
+            <h2 id="form-heading">Book Appointment</h2>
+            <form id="appointment-form">
+                <input type="hidden" id="appointment-id" value="">
+
+                <fieldset>
+                    <legend>Appointment Details</legend>
+
+                    <div>
+                        <label for="appointment-date">Date</label>
+                        <input type="datetime-local" id="appointment-date" required>
+                    </div>
+
+                    <div>
+                        <label for="service-type">Service Type</label>
+                        <select id="service-type" required>
+                            <option value="">Select service type</option>
+                            <option value="Oil Change">Oil Change</option>
+                            <option value="Brake Inspection">Brake Inspection</option>
+                            <option value="Tire Rotation">Tire Rotation</option>
+                            <option value="Engine Tune-Up">Engine Tune-Up</option>
+                            <option value="Battery Replacement">Battery Replacement</option>
+                            <option value="Full Service">Full Service</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="vehicle-select">Vehicle</label>
+                        <select id="vehicle-select" required>
+                            <option value="">Select vehicle</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="appointment-notes">Notes</label>
+                        <textarea id="appointment-notes" rows="3" placeholder="Any additional details"></textarea>
+                    </div>
+                </fieldset>
+
+                <menu>
+                    <button type="submit" id="submit-btn">Book Appointment</button>
+                    <button type="button" id="cancel-btn">Cancel</button>
+                </menu>
+            </form>
+        </section>
+
+        <section id="appointments-table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Service Type</th>
+                        <th>Vehicle</th>
+                        <th>Notes</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointments-tbody"></tbody>
+            </table>
+            <p id="no-appointments-msg">No appointments found. Book your first appointment above.</p>
+        </section>
+
+        <dialog id="confirm-dialog">
+            <p>Are you sure you want to cancel this appointment?</p>
+            <menu>
+                <button id="confirm-yes" type="button">Yes, Cancel It</button>
+                <button id="confirm-no" type="button">Go Back</button>
+            </menu>
+        </dialog>
+    </main>
+
+    <script src="../js/appointments.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer - Purchase & Service History</title>
+    <link rel="stylesheet" href="../css/customer-history.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Customer Portal</span>
+    </nav>
+
+    <main>
+        <header>
+            <h1>Purchase &amp; Service History</h1>
+            <input
+                type="number"
+                id="customer-id-input"
+                placeholder="Enter Customer ID"
+                min="1"
+            >
+            <button id="load-history-btn" type="button">View History</button>
+        </header>
+
+        <!-- Customer profile strip -->
+        <section id="customer-info-section">
+            <div id="customer-info-card">
+                <div id="customer-avatar"></div>
+                <div id="customer-details">
+                    <p id="customer-name">—</p>
+                    <p id="customer-email">—</p>
+                    <p id="customer-phone">—</p>
+                </div>
+                <div id="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-orders">0</span>
+                        <span class="stat-label">Orders</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-spent">Rs. 0.00</span>
+                        <span class="stat-label">Total Spent</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-vehicles">0</span>
+                        <span class="stat-label">Vehicles</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-services">0</span>
+                        <span class="stat-label">Service Visits</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-service-cost">Rs. 0.00</span>
+                        <span class="stat-label">Service Cost</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab bar -->
+        <div id="tab-bar">
+            <button class="tab-btn active" id="tab-purchases" type="button">Purchase History</button>
+            <button class="tab-btn" id="tab-vehicles" type="button">Vehicles &amp; Services</button>
+        </div>
+
+        <!-- Purchase history panel -->
+        <section id="purchases-section">
+            <table id="purchases-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="purchases-tbody"></tbody>
+            </table>
+            <p id="no-purchases-msg">No purchase history found.</p>
+        </section>
+
+        <!-- Order items detail panel (shown when a row is expanded) -->
+        <section id="order-detail-section">
+            <h2>Order <span id="order-detail-id"></span> — Items</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Part Name</th>
+                        <th>Unit Price</th>
+                        <th>Qty</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="order-items-tbody"></tbody>
+            </table>
+            <button id="close-detail-btn" type="button">← Back to Orders</button>
+        </section>
+
+        <!-- Vehicles + services panel -->
+        <section id="vehicles-section">
+            <div id="vehicle-list"></div>
+            <p id="no-vehicles-msg">No vehicles registered.</p>
+        </section>
+
+        <!-- Error message -->
+        <p id="error-msg"></p>
+    </main>
+
+    <script src="../js/customer-history.js"></script>
+</body>
+</html>

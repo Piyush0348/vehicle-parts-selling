@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css">
+<script src="../js/app.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Profile</h2>
+
+    <input id="fname">
+    <input id="lname">
+    <input id="phone">
+
+    <button onclick="update()">Update</button>
+</div>
+
+<script>
+function loadProfile() {
+    fetch(API + "/customers/1", {
+        headers: authHeader()
+    })
+    .then(res => res.json())
+    .then(data => {
+        fname.value = data.firstName;
+        lname.value = data.lastName;
+        phone.value = data.phone;
+    });
+}
+
+function update() {
+    fetch(API + "/customers/1", {
+        method: "PUT",
+        headers: authHeader(),
+        body: JSON.stringify({
+            firstName: fname.value,
+            lastName: lname.value,
+            phone: phone.value
+        })
+    }).then(() => alert("Updated"));
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

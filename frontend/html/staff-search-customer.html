@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoServe - Customer Management Portal</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/staff-search-customer.css">
+</head>
+<body>
+    <!-- Top Modern Navigation -->
+    <nav class="portal-nav">
+        <div class="nav-container">
+            <div class="logo-wrapper">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                    <circle cx="7" cy="17" r="2"></circle>
+                    <path d="M9 17h6"></path>
+                    <circle cx="17" cy="17" r="2"></circle>
+                </svg>
+                <span class="logo-text">AutoServe <span class="badge">Staff</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="staff-search-customer.html" class="nav-link active">Customers Directory</a>
+                <a href="staff-sales.html" class="nav-link">Sales & Invoices</a>
+                <a href="product.html" class="nav-link">Inventory</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <!-- Dashboard Header -->
+        <section class="dashboard-header-section">
+            <div class="header-text">
+                <h1>Customer Directory</h1>
+                <p>Search, register, and manage customer records, histories, and vehicles.</p>
+            </div>
+            
+            <div class="header-action-container">
+                <button id="summaryReportBtn" class="btn btn-secondary btn-with-icon" style="margin-right: 10px; background-color: #0b3c5d; color: white;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Summary Report
+                </button>
+                <button id="openRegisterModalBtn" class="btn btn-primary btn-with-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Create New Customer
+                </button>
+            </div>
+        </section>
+
+        <!-- Search and Filters Section -->
+        <section class="search-filter-section">
+            <div class="search-card">
+                <div class="search-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search by Name, Phone Number, Vehicle License Plate, or ID..."
+                        autocomplete="off"
+                    >
+                    <button id="clearSearchBtn" class="clear-btn hidden" type="button">&times;</button>
+                </div>
+                <button id="searchBtn" class="btn btn-secondary">Search Directory</button>
+            </div>
+        </section>
+
+        <!-- Customers Directory Table Card -->
+        <section class="directory-table-section">
+            <div class="card table-card">
+                <div class="table-header-row">
+                    <h2>All Customer Records</h2>
+                    <span class="results-count" id="resultsCount">Loading customers...</span>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer Name</th>
+                                <th>Contact Information</th>
+                                <th>Registered Vehicles</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <!-- Populated Dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="noResultsState" class="empty-state hidden">
+                    <div class="empty-state-icon">
+                        <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <h3>No Customers Found</h3>
+                    <p>We couldn't find any customer matching your search criteria. Try a different search query or create a new customer record.</p>
+                </div>
+
+                <!-- Table Skeleton Loader -->
+                <div id="tableLoader" class="table-skeleton">
+                    <div class="skeleton-row"></div>
+                    <div class="skeleton-row"></div>
+                    <div class="skeleton-row"></div>
+                    <div class="skeleton-row"></div>
+                    <div class="skeleton-row"></div>
+                </div>
+
+                <!-- Table Pagination -->
+                <div class="table-pagination-row">
+                    <div class="pagination-info">
+                        Showing <span id="pageStart">0</span> to <span id="pageEnd">0</span> of <span id="totalItems">0</span> customers
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="prevPageBtn" class="pagination-btn" disabled>&larr; Previous</button>
+                        <div class="page-numbers" id="pageNumbers">
+                            <!-- Dynamic Page Buttons -->
+                        </div>
+                        <button id="nextPageBtn" class="pagination-btn" disabled>Next &rarr;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="portal-footer">
+        <p>&copy; 2026 AutoServe CRM. All Rights Reserved. | Dedicated Staff Portal</p>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODALS & DIALOGS                           -->
+    <!-- ========================================== -->
+
+    <!-- 1. CREATE NEW CUSTOMER MODAL -->
+    <div id="createCustomerModal" class="modal-overlay hidden">
+        <div class="modal-box modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2>Register New Customer</h2>
+                    <p>Enter personal details and add vehicle information below</p>
+                </div>
+                <button type="button" class="modal-close-icon" onclick="closeModal('createCustomerModal')">&times;</button>
+            </div>
+            
+            <form id="customerRegistrationForm">
+                <div class="modal-body">
+                    <!-- Personal Info Grid -->
+                    <div class="form-section-title">Personal Details</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">First Name <span class="required">*</span></label>
+                            <input type="text" id="firstName" name="firstName" placeholder="e.g. Piyush" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name <span class="required">*</span></label>
+                            <input type="text" id="lastName" name="lastName" placeholder="e.g. Khadka" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" placeholder="e.g. piyush@example.com" required>
+                            <span class="error-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="e.g. +977-98XXXXXXXX">
+                            <span class="error-msg"></span>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Info Section -->
+                    <div class="form-section-header">
+                        <span class="form-section-title">Vehicle Information</span>
+                        <button type="button" id="addVehicleBtn" class="btn btn-secondary btn-sm">+ Add Another Vehicle</button>
+                    </div>
+
+                    <div id="vehiclesContainer">
+                        <!-- Instantiated Dynamically -->
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('createCustomerModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Register Customer & Vehicles</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. CUSTOMER DETAILS MODAL -->
+    <div id="customerDetailsModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <h2>Customer Profile Summary</h2>
+                    <p>Personal profile and contact status</p>
+                </div>
+                <button type="button" class="modal-close-icon" onclick="closeModal('customerDetailsModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detailsModalContent">
+                <!-- Dynamically Populated -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('customerDetailsModal')">Close</button>
+                <button type="button" id="detailsModalHistoryBtn" class="btn btn-primary">View Order History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. VEHICLE INFO MODAL -->
+    <div id="customerVehicleModal" class="modal-overlay hidden">
+        <div class="modal-box modal-medium">
+            <div class="modal-header">
+                <div>
+                    <h2>Registered Vehicles</h2>
+                    <p id="vehicleModalSubtitle">Vehicles owned by this customer</p>
+                </div>
+                <button type="button" class="modal-close-icon" onclick="closeModal('customerVehicleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="vehicleModalContent" class="vehicles-grid">
+                    <!-- Dynamically Populated -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('customerVehicleModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CUSTOMER HISTORY & INVOICE MODAL -->
+    <div id="customerHistoryModal" class="modal-overlay hidden">
+        <div class="modal-box modal-large">
+            <div class="modal-header">
+                <div>
+                    <h2>Customer Sales & Purchase History</h2>
+                    <p id="historyModalSubtitle">Past invoice history and billing summaries</p>
+                </div>
+                <button type="button" class="modal-close-icon" onclick="closeModal('customerHistoryModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Stats Summary -->
+                <div class="history-stats-bar">
+                    <div class="h-stat-card">
+                        <span class="stat-label">Total Orders</span>
+                        <span class="stat-val" id="histStatOrders">0</span>
+                    </div>
+                    <div class="h-stat-card">
+                        <span class="stat-label">Total Amount Spent</span>
+                        <span class="stat-val text-success" id="histStatSpent">Rs. 0.00</span>
+                    </div>
+                    <div class="h-stat-card">
+                        <span class="stat-label">Registered Vehicles</span>
+                        <span class="stat-val" id="histStatVehicles">0</span>
+                    </div>
+                    <div class="h-stat-card">
+                        <span class="stat-label">Average Order Value</span>
+                        <span class="stat-val" id="histStatAvg">Rs. 0.00</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive modal-table-container">
+                    <table class="modal-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Purchased Items Count</th>
+                                <th>Discount</th>
+                                <th>Total Bill</th>
+                                <th>Status</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Populated Dynamically -->
+                        </tbody>
+                    </table>
+                    <div id="noHistoryMessage" class="empty-table-message hidden">
+                        No purchase invoices recorded for this customer.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('customerHistoryModal')">Close History</button>
+                <button type="button" id="historyModalNewSaleBtn" class="btn btn-success">Create New Sale</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. INLINE ORDER DETAILS IN MODAL -->
+    <div id="orderDetailsDialog" class="modal-overlay hidden">
+        <div class="modal-box modal-medium">
+            <div class="modal-header">
+                <div>
+                    <h2>Invoice Item Details</h2>
+                    <p>Order ID: <strong id="orderDetailId">—</strong></p>
+                </div>
+                <button type="button" class="modal-close-icon" onclick="closeModal('orderDetailsDialog')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>Part Name</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-right">Unit Price</th>
+                            <th class="text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItemsTbody">
+                        <!-- Populated Dynamically -->
+                    </tbody>
+                </table>
+                <div class="invoice-summary-block">
+                    <div class="invoice-summary-row">
+                        <span>Items Subtotal:</span>
+                        <span id="subTotal">Rs. 0.00</span>
+                    </div>
+                    <div class="invoice-summary-row">
+                        <span>Applied Discount:</span>
+                        <span id="discountAmount">Rs. 0.00</span>
+                    </div>
+                    <div class="invoice-summary-row total-row">
+                        <span>Total Paid Bill:</span>
+                        <span id="orderTotal">Rs. 0.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('orderDetailsDialog')">Close Items</button>
+                <button id="printInvoiceBtn" type="button" class="btn btn-primary">Print Sales Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner & Toast Overlay -->
+    <div id="loadingSpinner" class="spinner-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Floating Global Alert Notifications -->
+    <div id="alertMessage" class="toast-notification hidden"></div>
+
+    <!-- Summary Report Modal -->
+    <div id="reportModal" class="modal-overlay hidden">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Customer Insights Report</h2>
+                <button type="button" class="modal-close-icon" onclick="closeModal('reportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="reportContent" class="report-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 0;">
+                    <!-- Dynamically filled -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('reportModal')">Close Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/staff-search-customer.js"></script>
+</body>
+</html>

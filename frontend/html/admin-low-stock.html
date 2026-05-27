@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Low Stock Alerts</title>
+    <link rel="stylesheet" href="../css/admin-low-stock.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Admin</span>
+    </nav>
+
+    <main>
+        <header>
+            <h1>Low Stock Alerts</h1>
+            <button id="refresh-btn" type="button">Refresh</button>
+            <button id="send-alert-btn" type="button">Send Alert Email</button>
+        </header>
+
+        <section id="alert-banner">
+            <p id="alert-count"></p>
+        </section>
+
+        <section id="stock-table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Part Name</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-tbody"></tbody>
+            </table>
+            <p id="no-stock-msg">All items are sufficiently stocked. No alerts.</p>
+        </section>
+
+        <section id="overdue-section">
+            <h2>Overdue Credit Payments</h2>
+            <div id="overdue-actions">
+                <button id="send-reminders-btn" type="button">Send Reminder Emails</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Order Date</th>
+                        <th>Amount Owed</th>
+                        <th>Days Overdue</th>
+                    </tr>
+                </thead>
+                <tbody id="overdue-tbody"></tbody>
+            </table>
+            <p id="no-overdue-msg">No overdue credit payments found.</p>
+        </section>
+
+        <dialog id="email-dialog">
+            <h3>Send Low Stock Alert</h3>
+            <div id="email-input-group">
+                <label for="admin-email">Admin Email</label>
+                <input type="email" id="admin-email" placeholder="admin@autoserve.com" required>
+            </div>
+            <menu>
+                <button id="email-confirm" type="button">Send Alert</button>
+                <button id="email-cancel" type="button">Cancel</button>
+            </menu>
+        </dialog>
+
+        <p id="success-msg"></p>
+        <p id="error-msg"></p>
+    </main>
+
+    <script src="../js/admin-low-stock.js"></script>
+</body>
+</html>

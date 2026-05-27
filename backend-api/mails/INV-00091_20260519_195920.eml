@@ -1,0 +1,91 @@
+From: "AutoServe Portal" <piyushkhadka@gmail.com>
+To: <piyushkhadka1256@gmail.com>
+Subject: AutoServe Purchase Invoice - INV-00091
+Date: Tue, 19 May 2026 19:59:20 GMT
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>AutoServe Sales Invoice</title>
+                    </head>
+                    <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b;">
+                        <div style="max-width: 650px; margin: 20px auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                            
+                            <!-- Header Banner -->
+                            <div style="background-color: #0b3c5d; padding: 30px; text-align: center;">
+                                <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px; font-weight: 800;">AUTOSERVE</h1>
+                                <p style="color: #38bdf8; margin: 5px 0 0 0; font-size: 14px; font-weight: 600;">Premium Vehicle Parts & Customer Portal</p>
+                            </div>
+
+                            <!-- Content -->
+                            <div style="padding: 30px;">
+                                <h2 style="color: #0f172a; margin-top: 0; font-size: 20px;">Sales Invoice Reciept</h2>
+                                <p style="color: #475569; line-height: 1.6;">
+                                    Dear <strong>Piyush Khadka</strong>,
+                                </p>
+                                <p style="color: #475569; line-height: 1.6;">
+                                    Thank you for purchasing vehicle parts with AutoServe. Your transaction has been completed successfully. 
+                                    A copy of your printable sales invoice has been generated below:
+                                </p>
+
+                                <!-- Details Metadata -->
+                                <table style="width: 100%; margin: 25px 0; font-size: 14px; color: #64748b;">
+                                    <tr>
+                                        <td><strong>Invoice Number:</strong> <span style="color: #0f172a; font-weight: bold;">INV-00091</span></td>
+                                        <td style="text-align: right;"><strong>Billing Date:</strong> <span style="color: #0f172a; font-weight: bold;">5/19/2026</span></td>
+                                    </tr>
+                                </table>
+
+                                <!-- Items Table -->
+                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                                    <thead>
+                                        <tr style="background-color: #f1f5f9; text-align: left;">
+                                            <th style="padding: 12px; border-bottom: 2px solid #cbd5e1; font-size: 0.85rem; color: #475569; font-weight: 700;">Part Description</th>
+                                            <th style="padding: 12px; border-bottom: 2px solid #cbd5e1; text-align: center; font-size: 0.85rem; color: #475569; font-weight: 700;">Qty</th>
+                                            <th style="padding: 12px; border-bottom: 2px solid #cbd5e1; text-align: right; font-size: 0.85rem; color: #475569; font-weight: 700;">Unit Price</th>
+                                            <th style="padding: 12px; border-bottom: 2px solid #cbd5e1; text-align: right; font-size: 0.85rem; color: #475569; font-weight: 700;">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                        <tr>
+                            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.95rem; color: #1e293b;">Brake Caliper</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 0.95rem; color: #1e293b;">1</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 0.95rem; color: #1e293b;">Rs. 12000.00</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 0.95rem; font-weight: bold; color: #0b3c5d;">Rs. 12000.00</td>
+                        </tr>
+                    
+                                    </tbody>
+                                </table>
+
+                                <!-- Totals Block -->
+                                <div style="width: 280px; margin-left: auto; background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    <table style="width: 100%; font-size: 14px; color: #475569;">
+                                        <tr>
+                                            <td style="padding: 4px 0;">Subtotal:</td>
+                                            <td style="padding: 4px 0; text-align: right; font-weight: 600;">Rs. 12000.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 4px 0;">Discount applied:</td>
+                                            <td style="padding: 4px 0; text-align: right; color: #16a34a; font-weight: 600;">- Rs. 1200.00</td>
+                                        </tr>
+                                        <tr style="font-size: 16px; font-weight: bold; color: #0f172a;">
+                                            <td style="padding: 8px 0 0 0; border-top: 1px solid #cbd5e1;">Total Paid:</td>
+                                            <td style="padding: 8px 0 0 0; border-top: 1px solid #cbd5e1; text-align: right; color: #0b3c5d;">Rs. 10800.00</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center; font-size: 13px; color: #94a3b8;">
+                                    <p>Thank you for your business! All parts carry our official standard warranty coverage.</p>
+                                    <p style="margin-top: 5px; font-weight: bold;">AutoServe Diagnostics & Vehicle Services Co.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                

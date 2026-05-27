@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - Customer Details</title>
+    <link rel="stylesheet" href="../css/staff-customer-detail.css">
+</head>
+<body>
+    <nav>
+        <span>Vehicle Parts Staff Portal</span>
+    </nav>
+
+    <script type="module" src="../js/navbar.js"></script>
+
+    <main>
+        <header>
+            <h1>Customer Details & History</h1>
+            <div class="header-actions">
+                <input
+                    type="number"
+                    id="customerIdInput"
+                    placeholder="Enter Customer ID"
+                    min="1"
+                >
+                <button id="loadHistoryBtn" type="button">Load History</button>
+                <button id="backBtn" type="button" class="btn-secondary">← Back</button>
+            </div>
+        </header>
+
+        <!-- Customer Information Section -->
+        <section id="customerInfoSection" class="hidden">
+            <div class="customer-card">
+                <div class="customer-avatar"></div>
+                <div class="customer-basic-info">
+                    <h2 id="customerName">—</h2>
+                    <p id="customerEmail">—</p>
+                    <p id="customerPhone">—</p>
+                </div>
+                <div class="customer-stats">
+                    <div class="stat-box">
+                        <span class="stat-value" id="statOrders">0</span>
+                        <span class="stat-label">Orders</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="statSpent">Rs. 0.00</span>
+                        <span class="stat-label">Total Spent</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="statVehicles">0</span>
+                        <span class="stat-label">Vehicles</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="statAvgOrder">Rs. 0.00</span>
+                        <span class="stat-label">Avg Order</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab Navigation -->
+        <div id="tabBar" class="tab-bar hidden">
+            <button class="tab-btn active" id="tabPurchases" type="button">Purchase History</button>
+            <button class="tab-btn" id="tabVehicles" type="button">Vehicles</button>
+        </div>
+
+        <!-- Purchase History Tab -->
+        <section id="purchaseSection" class="tab-content">
+            <h3>Purchase History</h3>
+            <table id="purchaseTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Discount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="purchaseTbody"></tbody>
+            </table>
+            <p id="noPurchasesMsg" class="no-data-msg">No purchases found.</p>
+        </section>
+
+        <!-- Vehicles Tab -->
+        <section id="vehicleSection" class="tab-content hidden">
+            <h3>Registered Vehicles</h3>
+            <div id="vehiclesList"></div>
+            <p id="noVehiclesMsg" class="no-data-msg">No vehicles registered.</p>
+        </section>
+
+        <!-- Order Details Modal -->
+        <dialog id="orderDetailsDialog">
+            <div class="dialog-content">
+                <div class="dialog-header">
+                    <h2>Order <span id="orderDetailId"></span> - Items</h2>
+                    <button type="button" id="closeOrderDialog" class="close-btn">&times;</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Part Name</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItemsTbody"></tbody>
+                </table>
+                <div class="order-totals">
+                    <p><strong>Subtotal:</strong> <span id="subTotal">Rs. 0.00</span></p>
+                    <p><strong>Discount:</strong> <span id="discountAmount">Rs. 0.00</span></p>
+                    <p><strong>Total:</strong> <span id="orderTotal">Rs. 0.00</span></p>
+                </div>
+                <menu>
+                    <button id="printInvoiceBtn" type="button" class="btn-primary">Print Invoice</button>
+                    <button type="button" id="closeOrderBtn">Close</button>
+                </menu>
+            </div>
+        </dialog>
+
+        <!-- Alert Messages -->
+        <div id="alertMessage" class="alert hidden"></div>
+    </main>
+
+    <script src="../js/staff-customer-detail.js"></script>
+</body>
+</html>

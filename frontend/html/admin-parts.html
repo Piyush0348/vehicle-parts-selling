@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoServe Admin — Parts Management</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+
+<nav class="admin-nav">
+    <div class="nav-container">
+        <div class="nav-brand">
+            AutoServe <span class="badge">Admin</span>
+        </div>
+        <div class="nav-links">
+            <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="admin-parts.html" class="nav-link active">Parts</a>
+            <a href="admin-staff.html" class="nav-link">Staff</a>
+            <a href="admin-vendors.html" class="nav-link">Vendors</a>
+            <button class="nav-logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<main class="admin-main">
+
+    <div class="page-header">
+        <div class="page-header-text">
+            <h1>Parts Management</h1>
+            <p>Manage vehicle parts inventory, pricing, and stock levels.</p>
+        </div>
+        <button class="btn btn-primary" id="open-form-btn">+ Add New Part</button>
+    </div>
+
+    <div class="search-bar-section">
+        <div class="search-card">
+            <div class="search-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" placeholder="Search parts by name or SKU...">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2>All Parts</h2>
+            <span class="results-badge" id="results-count">Loading...</span>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="parts-tbody"></tbody>
+            </table>
+        </div>
+
+        <div id="empty-state" class="empty-state hidden">
+            <h3>No Parts Found</h3>
+            <p>No parts match your search. Try a different keyword or add a new part.</p>
+        </div>
+
+        <div class="pagination-row">
+            <span class="pagination-info" id="pagination-info">Showing 0 to 0 of 0 parts</span>
+            <div class="pagination-controls" id="pagination-controls"></div>
+        </div>
+    </div>
+
+</main>
+
+<footer class="admin-footer">
+    <p>&copy; 2026 AutoServe Admin Portal. All Rights Reserved.</p>
+</footer>
+
+<div id="part-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h2 id="modal-title">Add New Part</h2>
+                <p>Fill in the part details below</p>
+            </div>
+            <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="part-form">
+                <input type="hidden" id="part-id">
+                <div class="form-section-label">Part Details</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="part-name">Name <span class="required">*</span></label>
+                        <input type="text" id="part-name" required placeholder="e.g. Brake Pad">
+                    </div>
+                    <div class="form-group">
+                        <label for="part-sku">SKU <span class="required">*</span></label>
+                        <input type="text" id="part-sku" required placeholder="e.g. BP-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="part-price">Price (Rs.) <span class="required">*</span></label>
+                        <input type="number" id="part-price" step="0.01" min="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="part-stock">Stock Quantity <span class="required">*</span></label>
+                        <input type="number" id="part-stock" min="0" required placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="part-category">Category <span class="required">*</span></label>
+                        <select id="part-category" required>
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="part-supplier">Supplier <span class="required">*</span></label>
+                        <select id="part-supplier" required>
+                            <option value="">Select supplier</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
+            <button class="btn btn-primary" id="submit-btn">Save Part</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirm-overlay" class="confirm-overlay hidden">
+    <div class="confirm-box">
+        <h3>Delete Part</h3>
+        <p>Are you sure you want to delete this part? This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-secondary" id="confirm-no">Cancel</button>
+            <button class="btn btn-danger" id="confirm-yes">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="../js/admin-parts.js"></script>
+</body>
+</html>
