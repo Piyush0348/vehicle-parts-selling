@@ -1,159 +1,186 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// Services/OrderService.cs
 using Microsoft.EntityFrameworkCore;
 using AutoServe.API.DTOs;
 
-namespace AutoServe.API.Services
+namespace AutoServe.API.Services;
+
+public class OrderService : IOrderService
 {
-    public class OrderService : IOrderService
+    private readonly AppDbContext _context;
+    private readonly IEmailService _emailService;
+
+    public OrderService(AppDbContext context, IEmailService emailService)
     {
-        private readonly AppDbContext _context;
-        private readonly IEmailService _emailService;
+        _context      = context;
+        _emailService = emailService;
+    }
 
-        public OrderService(AppDbContext context, IEmailService emailService)
-        {
-            _context = context;
-            _emailService = emailService;
-        }
+    // ── Calculate total and loyalty discount ───────────────────────────
+    public (decimal total, decimal discount) CalculateTotal(
+        List<OrderItem> items)
+    {
+        var subtotal = items.Sum(i => i.UnitPrice * i.Quantity);
 
-        public (decimal total, decimal discount) CalculateTotal(List<OrderItem> items)
-        {
-            var subtotal = items.Sum(i => i.UnitPrice * i.Quantity);
+        // 10% loyalty discount if subtotal > 5000
+        decimal discount = subtotal > 5000
+            ? subtotal * 0.10m
+            : 0;
 
-            decimal discount = 0;
-            if (subtotal > 5000)
-            {
-                discount = subtotal * 0.10m;
-            }
+        return (subtotal - discount, discount);
+    }
 
-            var total = subtotal - discount;
-            return (total, discount);
-        }
-
-        public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto)
-        {
-            var items = dto.Items?.Select(i => new OrderItem
+    // ── Create basic order ─────────────────────────────────────────────
+    public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto)
+    {
+        var items = dto.Items?
+            .Select(i => new OrderItem
             {
                 ProductId = i.ProductId,
-                Quantity = i.Quantity,
+                Quantity  = i.Quantity,
                 UnitPrice = i.UnitPrice
-            }).ToList() ?? new List<OrderItem>();
+            })
+            .ToList() ?? new List<OrderItem>();
 
-            var result = CalculateTotal(items);
+        var (total, discount) = CalculateTotal(items);
 
-            var order = new Order
-            {
-                OrderDate = dto.OrderDate,
-                Status = dto.Status,
-                CustomerId = dto.CustomerId,
-                TotalAmount = result.total,
-                DiscountAmount = result.discount,
-                OrderItems = items
-            };
-
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-
-            return new OrderDto
-            {
-                Id = order.Id,
-                OrderDate = order.OrderDate,
-                Status = order.Status,
-                CustomerId = order.CustomerId,
-                ItemCount = order.OrderItems.Count,
-                TotalAmount = order.TotalAmount,
-                DiscountAmount = order.DiscountAmount
-            };
-        }
-
-        public async Task<OrderWithDetailsDto> CreateSalesInvoiceAsync(CreateOrderDto dto)
+        var order = new Order
         {
-            // Validate customer exists
-            var customer = await _context.Customers.FindAsync(dto.CustomerId);
-            if (customer == null)
-                throw new KeyNotFoundException("Customer not found");
+            OrderDate      = dto.OrderDate,
+            Status         = dto.Status,
+            CustomerId     = dto.CustomerId,
+            TotalAmount    = total,
+            DiscountAmount = discount,
+            OrderItems     = items
+        };
 
-            var items = dto.Items?.Select(i => new OrderItem
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+
+        return new OrderDto
+        {
+            Id             = order.Id,
+            OrderDate      = order.OrderDate,
+            Status         = order.Status,
+            CustomerId     = order.CustomerId,
+            ItemCount      = order.OrderItems.Count,
+            TotalAmount    = order.TotalAmount,
+            DiscountAmount = order.DiscountAmount
+        };
+    }
+
+    // ── Create sales invoice and send email ────────────────────────────
+    public async Task<OrderWithDetailsDto> CreateSalesInvoiceAsync(
+        CreateOrderDto dto)
+    {
+        // Validate customer exists
+        var customer = await _context.Customers.FindAsync(dto.CustomerId);
+        if (customer == null)
+            throw new KeyNotFoundException("Customer not found");
+
+        // Build order items
+        var items = dto.Items?
+            .Select(i => new OrderItem
             {
                 ProductId = i.ProductId,
-                Quantity = i.Quantity,
+                Quantity  = i.Quantity,
                 UnitPrice = i.UnitPrice
-            }).ToList() ?? new List<OrderItem>();
+            })
+            .ToList() ?? new List<OrderItem>();
 
-            var result = CalculateTotal(items);
+        var (total, discount) = CalculateTotal(items);
 
-            var order = new Order
+        // Create and save the order
+        var order = new Order
+        {
+            OrderDate      = dto.OrderDate,
+            Status         = "Completed",
+            CustomerId     = dto.CustomerId,
+            TotalAmount    = total,
+            DiscountAmount = discount,
+            OrderItems     = items
+        };
+
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+
+        // ── Send invoice email ─────────────────────────────────────────
+        if (!string.IsNullOrWhiteSpace(customer.Email))
+        {
+            try
             {
-                OrderDate = dto.OrderDate,
-                Status = "Completed",
-                CustomerId = dto.CustomerId,
-                TotalAmount = result.total,
-                DiscountAmount = result.discount,
-                OrderItems = items
-            };
-
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-
-            // Trigger invoice email sending within the request scope to guarantee execution and resolve product details
-            if (!string.IsNullOrEmpty(customer.Email))
-            {
-                // Fetch product details inside request scope before the context is disposed
-                var productIds = items.Select(oi => oi.ProductId).ToList();
+                // Fetch product names from database
+                var productIds  = items.Select(oi => oi.ProductId).ToList();
                 var productsMap = await _context.Products
                     .Where(p => productIds.Contains(p.Id))
                     .ToDictionaryAsync(p => p.Id, p => p.Name);
 
-                var orderSummaryItems = items.Select(oi => new OrderItemSummaryDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = productsMap.TryGetValue(oi.ProductId, out var name) ? name : "Vehicle Part",
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList();
+                // Build InvoiceItemDto list (matches IEmailService signature)
+                var invoiceItems = items
+                    .Select(oi => new InvoiceItemDto(
+                        ProductName: productsMap.TryGetValue(
+                                         oi.ProductId, out var name)
+                                         ? name
+                                         : "Vehicle Part",
+                        Quantity:    oi.Quantity,
+                        UnitPrice:   oi.UnitPrice,
+                        Subtotal:    oi.Quantity * oi.UnitPrice
+                    ))
+                    .ToList();
 
-                string toEmail = customer.Email;
-                string toName = $"{customer.FirstName} {customer.LastName}".Trim();
-                string invoiceNo = $"INV-{order.Id:D5}";
-                decimal subTotal = items.Sum(i => i.UnitPrice * i.Quantity);
-                decimal discountAmt = result.discount;
-                decimal totalAmt = result.total;
+                var customerName = $"{customer.FirstName} {customer.LastName}".Trim();
 
-                try
-                {
-                    await _emailService.SendInvoiceEmailAsync(toEmail, toName, invoiceNo, subTotal, discountAmt, totalAmt, orderSummaryItems);
-                }
-                catch (Exception emailEx)
-                {
-                    Console.WriteLine($"[EMAIL DISPATCH FAIL] {emailEx.Message}");
-                }
+                await _emailService.SendInvoiceEmailAsync(
+                    toEmail:        customer.Email,
+                    customerName:   customerName,
+                    orderId:        order.Id,       
+                    totalAmount:    total,            
+                    discountAmount: discount,         
+                    orderStatus:    order.Status,     
+                    items:          invoiceItems      
+                );
             }
-
-            return new OrderWithDetailsDto
+            catch (Exception emailEx)
             {
-                Id = order.Id,
-                OrderDate = order.OrderDate,
-                Status = order.Status,
-                TotalAmount = order.TotalAmount,
-                DiscountAmount = order.DiscountAmount,
-                Customer = new CustomerDto
-                {
-                    Id = customer.Id,
-                    FirstName = customer.FirstName,
-                    LastName = customer.LastName,
-                    Email = customer.Email,
-                    Phone = customer.Phone
-                },
-                OrderItems = items.Select(oi => new OrderItemSummaryDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = _context.Products.Find(oi.ProductId)?.Name ?? "Vehicle Part",
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList()
-            };
+                // Log but do not fail the order if email fails
+                Console.WriteLine(
+                    $"[EMAIL DISPATCH FAIL] {emailEx.Message}");
+            }
         }
+
+        // ── Build product name map for response ────────────────────────
+        var productNameMap = await _context.Products
+            .Where(p => items.Select(i => i.ProductId).Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id, p => p.Name);
+
+        return new OrderWithDetailsDto
+        {
+            Id             = order.Id,
+            OrderDate      = order.OrderDate,
+            Status         = order.Status,
+            TotalAmount    = order.TotalAmount,
+            DiscountAmount = order.DiscountAmount,
+
+            Customer = new CustomerDto
+            {
+                Id        = customer.Id,
+                FirstName = customer.FirstName,
+                LastName  = customer.LastName,
+                Email     = customer.Email,
+                Phone     = customer.Phone
+            },
+
+            OrderItems = items
+                .Select(oi => new OrderItemSummaryDto
+                {
+                    ProductId   = oi.ProductId,
+                    ProductName = productNameMap.TryGetValue(
+                                      oi.ProductId, out var n)
+                                      ? n
+                                      : "Vehicle Part",
+                    Quantity    = oi.Quantity,
+                    UnitPrice   = oi.UnitPrice
+                })
+                .ToList()
+        };
     }
 }

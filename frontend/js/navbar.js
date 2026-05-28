@@ -192,6 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ${link("admin-staff.html", "Staff")}
             ${link("admin-vendors.html", "Vendors")}
             ${link("admin-low-stock.html", "Low Stock")}
+            ${link("admin-purchase-invoice.html", "Purchase Invoice")}
+            ${link("admin-financial-reports.html", "Reports")}
         `;
     } else if (role === "Staff") {
         badge = `<span class="nav-role-tag nav-role-staff">Staff</span>`;

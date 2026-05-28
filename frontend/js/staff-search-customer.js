@@ -140,31 +140,146 @@ async function showSummaryReport() {
         if (!response.ok) throw new Error('Failed to generate report');
 
         const data = await response.json();
-        const content = document.getElementById('reportContent');
+        const cardsContainer = document.getElementById('reportOverviewCards');
 
-        content.innerHTML = `
-            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #0b3c5d;">
-                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;">Total Customers</div>
-                <div style="font-size: 1.5rem; font-weight: 800; color: #0b3c5d;">${data.totalCustomers}</div>
+        cardsContainer.innerHTML = `
+            <div class="h-stat-card" style="border-left: 4px solid var(--primary-color);">
+                <span class="stat-label">Total Customers</span>
+                <span class="stat-val" style="color: var(--primary-color);">${data.totalCustomers}</span>
             </div>
-            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">
-                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;">Regulars (2+ Orders)</div>
-                <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">${data.regularCustomers}</div>
+            <div class="h-stat-card" style="border-left: 4px solid var(--success-color);">
+                <span class="stat-label">Regulars (2+ Orders)</span>
+                <span class="stat-val" style="color: var(--success-color);">${data.regularCustomers}</span>
             </div>
-            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;">High Spenders (>10k)</div>
-                <div style="font-size: 1.5rem; font-weight: 800; color: #f59e0b;">${data.highSpenders}</div>
+            <div class="h-stat-card" style="border-left: 4px solid var(--warning-color);">
+                <span class="stat-label">High Spenders</span>
+                <span class="stat-val" style="color: var(--warning-color);">${data.highSpenders}</span>
             </div>
-            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #ef4444;">
-                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;">Due for Service</div>
-                <div style="font-size: 1.5rem; font-weight: 800; color: #ef4444;">${data.pendingFollowups}</div>
+            <div class="h-stat-card" style="border-left: 4px solid var(--danger-color);">
+                <span class="stat-label">Overdue Service</span>
+                <span class="stat-val" style="color: var(--danger-color);">${data.pendingFollowups}</span>
             </div>
         `;
+
+        // Initialize Tab Event Listeners if not already done
+        if (!window.reportTabsInitialized) {
+            document.querySelectorAll('[data-reptab]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-reptab]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    loadReportTab(btn.dataset.reptab);
+                });
+            });
+            window.reportTabsInitialized = true;
+        }
+
+        // Reset active tab to regulars and load it
+        document.querySelectorAll('[data-reptab]').forEach(btn => {
+            if (btn.dataset.reptab === 'regulars') btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
         openModal('reportModal');
+        await loadReportTab('regulars');
     } catch (err) {
         showToast(err.message, 'error');
     } finally {
         toggleSpinner(false);
+    }
+}
+
+async function loadReportTab(tabName) {
+    const loadingEl = document.getElementById('reportTabLoading');
+    const tableEl = document.getElementById('reportTabTable');
+    const theadEl = document.getElementById('reportTabThead');
+    const tbodyEl = document.getElementById('reportTabTbody');
+    const emptyEl = document.getElementById('reportTabEmpty');
+
+    loadingEl.classList.remove('hidden');
+    tableEl.classList.add('hidden');
+    emptyEl.classList.add('hidden');
+    tbodyEl.innerHTML = '';
+    theadEl.innerHTML = '';
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/customers/reports?type=${tabName}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to load report category details');
+
+        const details = await response.json();
+        loadingEl.classList.add('hidden');
+
+        if (!details || details.length === 0) {
+            emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        // Generate Headers & Populate Rows based on type
+        if (tabName === 'regulars') {
+            theadEl.innerHTML = `
+                <tr>
+                    <th>Customer</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th class="text-center">Completed Orders</th>
+                    <th class="text-right">Total Spent</th>
+                </tr>
+            `;
+            tbodyEl.innerHTML = details.map(item => `
+                <tr>
+                    <td><strong>${item.name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">ID: #${item.id}</span></td>
+                    <td>${item.email}</td>
+                    <td>${item.phone || '—'}</td>
+                    <td class="text-center"><span class="results-count">${item.totalOrders}</span></td>
+                    <td class="text-right" style="font-weight: 700; color: var(--success-dark)">Rs. ${Number(item.totalSpent).toFixed(2)}</td>
+                </tr>
+            `).join('');
+        } else if (tabName === 'high-spenders') {
+            theadEl.innerHTML = `
+                <tr>
+                    <th>Customer</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th class="text-center">Orders Count</th>
+                    <th class="text-right">Total Spent</th>
+                </tr>
+            `;
+            tbodyEl.innerHTML = details.map(item => `
+                <tr>
+                    <td><strong>${item.name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">ID: #${item.id}</span></td>
+                    <td>${item.email}</td>
+                    <td>${item.phone || '—'}</td>
+                    <td class="text-center"><span class="results-count">${item.totalOrders}</span></td>
+                    <td class="text-right" style="font-weight: 700; color: var(--primary-color)">Rs. ${Number(item.totalSpent).toFixed(2)}</td>
+                </tr>
+            `).join('');
+        } else if (tabName === 'pending-credits') {
+            theadEl.innerHTML = `
+                <tr>
+                    <th>Customer</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th class="text-center">Unpaid Orders</th>
+                    <th class="text-right">Total Unpaid Amount</th>
+                </tr>
+            `;
+            tbodyEl.innerHTML = details.map(item => `
+                <tr>
+                    <td><strong>${item.name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">ID: #${item.id}</span></td>
+                    <td>${item.email}</td>
+                    <td>${item.phone || '—'}</td>
+                    <td class="text-center"><span class="results-count" style="background:#fee2e2; color:#ef4444">${item.unpaidOrdersCount}</span></td>
+                    <td class="text-right"><span class="badge-unpaid">Rs. ${Number(item.totalUnpaidAmount).toFixed(2)}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        tableEl.classList.remove('hidden');
+    } catch (err) {
+        loadingEl.classList.add('hidden');
+        showToast(err.message, 'error');
     }
 }
 

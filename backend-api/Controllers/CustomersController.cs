@@ -424,4 +424,109 @@ public class CustomersController : ControllerBase
             return BadRequest(new { message = "Invalid report type. Allowed: regulars, high-spenders, pending-credits" });
         }
     }
+
+    // Add this inside CustomersController.cs at the bottom
+
+    /// <summary>
+    /// Get full purchase and service history for a customer
+    /// </summary>
+    [Authorize(Roles = "Admin,Staff,Customer")]
+    [HttpGet("{id:int}/history")]
+    public async Task<IActionResult> GetHistory(int id)
+    {
+        // Load customer with vehicles
+        var customer = await _context.Customers
+            .Include(c => c.Vehicles)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (customer == null)
+            return NotFound(new { message = $"Customer with ID {id} was not found." });
+
+        // Load orders with order items and products
+        var orders = await _context.Orders
+            .Where(o => o.CustomerId == id)
+            .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+            .OrderByDescending(o => o.OrderDate)
+            .AsNoTracking()
+            .ToListAsync();
+
+        // Load service records for all customer vehicles
+        var vehicleIds = customer.Vehicles.Select(v => v.Id).ToList();
+
+        var serviceRecords = await _context.ServiceRecords
+            .Where(sr => vehicleIds.Contains(sr.VehicleId))
+            .OrderByDescending(sr => sr.ServiceDate)
+            .AsNoTracking()
+            .ToListAsync();
+
+        // Build purchase history
+        var purchaseHistory = orders.Select(o => new PurchaseHistoryDto
+        {
+            OrderId    = o.Id,
+            OrderDate  = o.OrderDate,
+            TotalAmount = o.TotalAmount,
+            Status     = o.Status,
+            Items      = o.OrderItems.Select(oi => new OrderItemHistoryDto
+            {
+                ProductName = oi.Product?.Name ?? "Unknown",
+                Quantity    = oi.Quantity,
+                UnitPrice   = oi.UnitPrice
+            }).ToList()
+        }).ToList();
+
+        // Build vehicle history with service records
+        var vehicleHistory = customer.Vehicles.Select(v => new VehicleHistoryDto
+        {
+            VehicleId         = v.Id,
+            VehicleNumber     = v.VehicleNumber,
+            VehicleMake       = v.VehicleMake,
+            VehicleModel      = v.VehicleModel,
+            ManufacturingYear = v.ManufacturingYear,
+            Color             = v.Color,
+            ServiceHistory    = serviceRecords
+                .Where(sr => sr.VehicleId == v.Id)
+                .Select(sr => new ServiceRecordHistoryDto
+                {
+                    ServiceDate  = sr.ServiceDate,
+                    ServiceType  = sr.ServiceType,
+                    Description  = sr.Description,
+                    TotalCost    = sr.TotalCost,
+                    Status       = sr.Status
+                }).ToList()
+        }).ToList();
+
+        // Calculate summary stats
+        var totalSpent        = orders
+            .Where(o => o.Status == "Completed" || o.Status == "Paid")
+            .Sum(o => o.TotalAmount);
+
+        var totalServiceCost  = serviceRecords
+            .Where(sr => sr.Status == "Completed")
+            .Sum(sr => sr.TotalCost);
+
+        var totalServiceVisits = serviceRecords
+            .Count(sr => sr.Status == "Completed");
+
+        var response = new CustomerHistoryResponseDto
+        {
+            CustomerId   = customer.Id,
+            CustomerName = customer.FirstName + " " + customer.LastName,
+            Email        = customer.Email,
+            Phone        = customer.Phone,
+            Summary      = new CustomerHistorySummaryDto
+            {
+                TotalOrders        = orders.Count,
+                TotalSpent         = totalSpent,
+                TotalVehicles      = customer.Vehicles.Count,
+                TotalServiceVisits = totalServiceVisits,
+                TotalServiceCost   = totalServiceCost
+            },
+            PurchaseHistory = purchaseHistory,
+            Vehicles        = vehicleHistory
+        };
+
+        return Ok(response);
+    }
 }

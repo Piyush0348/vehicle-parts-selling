@@ -3,43 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Vehicle Prediction</title>
+    <title>AutoServe | AI Vehicle Prediction</title>
+    <meta name="description" content="Predict vehicle problems using AI — analyze mileage, engine health, battery performance and service history.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module">
-        import RBAC from "../js/rbac.js";
-
-        if (!RBAC.isAuthenticated()) {
-            window.location.href = "login.html";
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const userNameEl = document.getElementById('user-name');
-            const userRoleEl = document.getElementById('user-role');
-
-            if (userNameEl) userNameEl.textContent = RBAC.getUserName();
-            if (userRoleEl) userRoleEl.textContent = RBAC.getUserRole();
-        });
-    </script>
 </head>
 <body class="bg-slate-100 min-h-screen">
-<nav class="bg-slate-900 text-white px-8 py-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">AutoServe - AI Prediction</h1>
-    <div class="flex gap-6 items-center">
-        <a href="index.html" class="hover:text-blue-400">Home</a>
-        <a href="appointments.html" class="hover:text-blue-400">Appointments</a>
-        <a href="ai-prediction.html" class="text-blue-400">AI Prediction</a>
-        <a href="profile.html" class="hover:text-blue-400">Profile</a>
-        <div class="border-l border-slate-700 pl-4">
-            <span class="text-sm text-slate-300">Welcome: <strong id="user-name">User</strong></span>
-            <span class="text-xs text-slate-400 ml-2">(<strong id="user-role">Customer</strong>)</span>
-        </div>
-        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</button>
-    </div>
-</nav>
+
+<nav></nav>
+<script type="module" src="../js/navbar.js"></script>
 
 <section class="max-w-7xl mx-auto py-10 px-6">
     <div class="mb-10">
-        <h2 class="text-4xl font-bold text-slate-800 mb-3">Predict Vehicle Problems Using AI</h2>
+        <h1 class="text-4xl font-bold text-slate-800 mb-3">Predict Vehicle Problems Using AI</h1>
         <p class="text-slate-500 text-lg">Analyze vehicle condition based on mileage, service history, engine health, and battery performance.</p>
     </div>
 
@@ -67,7 +42,7 @@
             </div>
         </div>
 
-        <button onclick="predictFailure()" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-lg shadow-md">Predict Now</button>
+        <button id="predictBtn" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-lg shadow-md">Predict Now</button>
     </div>
 
     <div id="predictionBox" class="hidden bg-white rounded-2xl shadow-lg p-8">
@@ -122,7 +97,11 @@
     import AI from "../js/ai.js";
     import RBAC from "../js/rbac.js";
 
-    window.predictFailure = async function () {
+    if (!RBAC.isAuthenticated()) {
+        window.location.href = "login.html";
+    }
+
+    document.getElementById("predictBtn").addEventListener("click", async function () {
         try {
             const mileage = document.getElementById("mileage").value;
             const year = document.getElementById("year").value;
@@ -171,19 +150,7 @@
             console.error(error);
             alert("Prediction failed");
         }
-    };
-
-    window.logout = function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        window.location.href = "login.html";
-    };
-
-    const userNameEl = document.getElementById('user-name');
-    const userRoleEl = document.getElementById('user-role');
-    if (userNameEl) userNameEl.textContent = RBAC.getUserName();
-    if (userRoleEl) userRoleEl.textContent = RBAC.getUserRole();
+    });
 </script>
-<script type="module" src="../js/navbar.js"></script>
 </body>
 </html>

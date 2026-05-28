@@ -1,182 +1,369 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+// Services/EmailService.cs
 using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using AutoServe.API.DTOs;
 
-namespace AutoServe.API.Services
+namespace AutoServe.API.Services;
+
+public class EmailService : IEmailService
 {
-    public class EmailService : IEmailService
+    private readonly EmailOptions _settings;
+    private readonly ILogger<EmailService> _logger;
+
+    public EmailService(
+        IOptions<EmailOptions> options,
+        ILogger<EmailService> logger)
     {
-        private readonly IConfiguration _configuration;
-        private readonly AppDbContext _context;
-        private readonly ILogger<EmailService> _logger;
+        _settings = options.Value;
+        _logger   = logger;
+    }
 
-        public EmailService(IConfiguration configuration, AppDbContext context, ILogger<EmailService> logger)
+    // ── Core SMTP sender ───────────────────────────────────────────────
+    private async Task SendAsync(
+        string toEmail,
+        string subject,
+        string htmlBody)
+    {
+        try
         {
-            _configuration = configuration;
-            _context = context;
-            _logger = logger;
+            using var client = new SmtpClient(_settings.Host, _settings.Port)
+            {
+                Credentials = new NetworkCredential(
+                    _settings.Username,
+                    _settings.Password),
+                EnableSsl = true
+            };
+
+            using var message = new MailMessage
+            {
+                From       = new MailAddress(
+                                 _settings.FromAddress,
+                                 _settings.FromName),
+                Subject    = subject,
+                Body       = htmlBody,
+                IsBodyHtml = true
+            };
+
+            message.To.Add(toEmail);
+            await client.SendMailAsync(message);
+
+            _logger.LogInformation(
+                "Email sent to {Email} — {Subject}",
+                toEmail, subject);
         }
-
-        private async Task SendAsync(string toEmail, string toName, string subject, string htmlBody)
+        catch (Exception ex)
         {
-            try
-            {
-                string smtpServer = _configuration["Smtp:Server"] ?? "localhost";
-                int smtpPort = int.Parse(_configuration["Smtp:Port"] ?? "25");
-                string senderEmail = _configuration["Smtp:SenderEmail"] ?? "no-reply@autoserve.com";
-                string senderName = _configuration["Smtp:SenderName"] ?? "AutoServe Portal";
-                string username = _configuration["Smtp:Username"] ?? "";
-                string password = _configuration["Smtp:Password"] ?? "";
-                bool enableSsl = bool.Parse(_configuration["Smtp:EnableSsl"] ?? "false");
-
-                using (var mail = new MailMessage())
-                {
-                    mail.From = new MailAddress(senderEmail, senderName);
-                    mail.To.Add(new MailAddress(toEmail, toName));
-                    mail.Subject = subject;
-                    mail.Body = htmlBody;
-                    mail.IsBodyHtml = true;
-
-                    using (var smtp = new SmtpClient(smtpServer, smtpPort))
-                    {
-                        smtp.EnableSsl = enableSsl;
-                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                        smtp.UseDefaultCredentials = string.IsNullOrEmpty(username);
-
-                        if (!string.IsNullOrEmpty(username))
-                        {
-                            smtp.Credentials = new NetworkCredential(username, password);
-                        }
-
-                        await smtp.SendMailAsync(mail);
-                        _logger.LogInformation($"[SMTP] Email successfully sent to {toEmail}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[SMTP ERROR] Could not send email to {toEmail}: {ex.Message}");
-            }
+            _logger.LogError(ex,
+                "Failed to send email to {Email} — {Subject}",
+                toEmail, subject);
+            throw;
         }
+    }
 
-        public async Task SendInvoiceEmailAsync(string toEmail, string toName, string invoiceNumber, decimal subTotal, decimal discountAmount, decimal totalAmount, List<OrderItemSummaryDto> items)
-        {
-            try
-            {
-                var itemRows = new StringBuilder();
-                foreach (var item in items)
-                {
-                    string prodName = item.ProductName;
-                    if (string.IsNullOrEmpty(prodName) && item.ProductId > 0)
-                    {
-                        var product = await _context.Products.FindAsync(item.ProductId);
-                        prodName = product?.Name ?? "Vehicle Part";
-                    }
+    // ── Send Invoice (used by NotificationsController) ─────────────────
+    public async Task SendInvoiceAsync(
+        string               toEmail,
+        string               customerName,
+        int                  orderId,
+        decimal              totalAmount,
+        decimal              discountAmount,
+        string               orderStatus,
+        List<InvoiceItemDto> items)
+    {
+        var itemRows = string.Join("", items.Select(item => $@"
+            <tr>
+                <td style='padding:8px;border:1px solid #ddd'>
+                    {item.ProductName}
+                </td>
+                <td style='padding:8px;border:1px solid #ddd;
+                           text-align:center'>
+                    {item.Quantity}
+                </td>
+                <td style='padding:8px;border:1px solid #ddd;
+                           text-align:right'>
+                    Rs. {item.UnitPrice:F2}
+                </td>
+                <td style='padding:8px;border:1px solid #ddd;
+                           text-align:right'>
+                    Rs. {item.Subtotal:F2}
+                </td>
+            </tr>"));
 
-                    itemRows.Append($@"
-                        <tr>
-                            <td style=""padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.95rem; color: #1e293b;"">{prodName}</td>
-                            <td style=""padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 0.95rem; color: #1e293b;"">{item.Quantity}</td>
-                            <td style=""padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 0.95rem; color: #1e293b;"">Rs. {item.UnitPrice:F2}</td>
-                            <td style=""padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 0.95rem; font-weight: bold; color: #0b3c5d;"">Rs. {(item.Quantity * item.UnitPrice):F2}</td>
+        var netTotal = totalAmount - discountAmount;
+
+        var html = $@"
+        <div style='font-family:Arial,sans-serif;
+                    max-width:650px;margin:0 auto'>
+
+            <div style='background:#1a73e8;color:white;
+                        padding:24px;border-radius:8px 8px 0 0'>
+                <h2 style='margin:0'>
+                    AutoServe — Invoice #{orderId}
+                </h2>
+            </div>
+
+            <div style='padding:24px;
+                        border:1px solid #ddd;
+                        border-top:none'>
+
+                <p>Dear <strong>{customerName}</strong>,</p>
+                <p>Thank you for your purchase.
+                   Here is your invoice summary.</p>
+
+                <table style='width:100%;
+                              border-collapse:collapse;
+                              margin:16px 0'>
+                    <thead>
+                        <tr style='background:#f5f5f5'>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:left'>
+                                Product
+                            </th>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:center'>
+                                Qty
+                            </th>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:right'>
+                                Unit Price
+                            </th>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:right'>
+                                Subtotal
+                            </th>
                         </tr>
-                    ");
-                }
+                    </thead>
+                    <tbody>{itemRows}</tbody>
+                </table>
 
-                string htmlBody = $@"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta charset=""UTF-8"">
-                        <title>AutoServe Sales Invoice</title>
-                    </head>
-                    <body style=""font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b;"">
-                        <div style=""max-width: 650px; margin: 20px auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);"">
-                            <div style=""background-color: #0b3c5d; padding: 30px; text-align: center;"">
-                                <h1 style=""color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px; font-weight: 800;"">AUTOSERVE</h1>
-                                <p style=""color: #38bdf8; margin: 5px 0 0 0; font-size: 14px; font-weight: 600;"">Premium Vehicle Parts & Customer Portal</p>
-                            </div>
-                            <div style=""padding: 30px;"">
-                                <h2 style=""color: #0f172a; margin-top: 0; font-size: 20px;"">Sales Invoice Reciept</h2>
-                                <p style=""color: #475569; line-height: 1.6;"">Dear <strong>{toName}</strong>,</p>
-                                <p style=""color: #475569; line-height: 1.6;"">Thank you for purchasing vehicle parts with AutoServe. Your transaction has been completed successfully.</p>
-                                <table style=""width: 100%; margin: 25px 0; font-size: 14px; color: #64748b;"">
-                                    <tr>
-                                        <td><strong>Invoice Number:</strong> <span style=""color: #0f172a; font-weight: bold;"">{invoiceNumber}</span></td>
-                                        <td style=""text-align: right;""><strong>Billing Date:</strong> <span style=""color: #0f172a; font-weight: bold;"">{DateTime.Now.ToShortDateString()}</span></td>
-                                    </tr>
-                                </table>
-                                <table style=""width: 100%; border-collapse: collapse; margin-bottom: 25px;"">
-                                    <thead>
-                                        <tr style=""background-color: #f1f5f9; text-align: left;"">
-                                            <th style=""padding: 12px; border-bottom: 2px solid #cbd5e1; font-size: 0.85rem; color: #475569; font-weight: 700;"">Part Description</th>
-                                            <th style=""padding: 12px; border-bottom: 2px solid #cbd5e1; text-align: center; font-size: 0.85rem; color: #475569; font-weight: 700;"">Qty</th>
-                                            <th style=""padding: 12px; border-bottom: 2px solid #cbd5e1; text-align: right; font-size: 0.85rem; color: #475569; font-weight: 700;"">Unit Price</th>
-                                            <th style=""padding: 12px; border-bottom: 2px solid #cbd5e1; text-align: right; font-size: 0.85rem; color: #475569; font-weight: 700;"">Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>{itemRows}</tbody>
-                                </table>
-                                <div style=""width: 280px; margin-left: auto; background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;"">
-                                    <table style=""width: 100%; font-size: 14px; color: #475569;"">
-                                        <tr><td style=""padding: 4px 0;"">Subtotal:</td><td style=""padding: 4px 0; text-align: right; font-weight: 600;"">Rs. {subTotal:F2}</td></tr>
-                                        <tr><td style=""padding: 4px 0;"">Discount applied:</td><td style=""padding: 4px 0; text-align: right; color: #16a34a; font-weight: 600;"">- Rs. {discountAmount:F2}</td></tr>
-                                        <tr style=""font-size: 16px; font-weight: bold; color: #0f172a;"">
-                                            <td style=""padding: 8px 0 0 0; border-top: 1px solid #cbd5e1;"">Total Paid:</td>
-                                            <td style=""padding: 8px 0 0 0; border-top: 1px solid #cbd5e1; text-align: right; color: #0b3c5d;"">Rs. {totalAmount:F2}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </body>
-                    </html>";
+                <table style='width:100%;margin-top:8px'>
+                    <tr>
+                        <td style='text-align:right;padding:4px'>
+                            Subtotal:
+                        </td>
+                        <td style='text-align:right;
+                                   padding:4px;width:140px'>
+                            Rs. {totalAmount:F2}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style='text-align:right;
+                                   padding:4px;color:green'>
+                            Discount:
+                        </td>
+                        <td style='text-align:right;
+                                   padding:4px;color:green'>
+                            - Rs. {discountAmount:F2}
+                        </td>
+                    </tr>
+                    <tr style='font-weight:bold;font-size:1.1em'>
+                        <td style='text-align:right;padding:4px'>
+                            Total Payable:
+                        </td>
+                        <td style='text-align:right;padding:4px'>
+                            Rs. {netTotal:F2}
+                        </td>
+                    </tr>
+                </table>
 
-                await SendAsync(toEmail, toName, $"AutoServe Purchase Invoice - {invoiceNumber}", htmlBody);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[SMTP ERROR] Could not format or send invoice email: {ex.Message}");
-            }
-        }
+                <p style='margin-top:16px'>
+                    Status: <strong>{orderStatus}</strong>
+                </p>
+                <hr>
+                <p style='color:#888;font-size:0.85em'>
+                    AutoServe Auto Parts — Nepal<br>
+                    Contact: 9800000000
+                </p>
+            </div>
+        </div>";
 
-        public async Task SendInvoiceAsync(string toEmail, string toName, int orderId, decimal totalAmount, decimal discountAmount, string status, List<InvoiceItemDto> items)
+        await SendAsync(
+            toEmail,
+            $"AutoServe Invoice — Order #{orderId}",
+            html);
+    }
+
+    // ── SendInvoiceEmailAsync (alias used by OrderService) ─────────────
+    public async Task SendInvoiceEmailAsync(
+        string               toEmail,
+        string               customerName,
+        int                  orderId,
+        decimal              totalAmount,
+        decimal              discountAmount,
+        string               orderStatus,
+        List<InvoiceItemDto> items)
+    {
+        await SendInvoiceAsync(
+            toEmail,
+            customerName,
+            orderId,
+            totalAmount,
+            discountAmount,
+            orderStatus,
+            items);
+    }
+
+    // ── Send Low Stock Alert ───────────────────────────────────────────
+    public async Task SendLowStockAlertAsync(
+        string                adminEmail,
+        List<LowStockItemDto> items)
+    {
+        var itemRows = string.Join("", items.Select(item =>
         {
-            var summaryItems = items.Select(i => new OrderItemSummaryDto
-            {
-                ProductName = i.ProductName,
-                Quantity = i.Quantity,
-                UnitPrice = i.UnitPrice
-            }).ToList();
+            var color = item.StockQty == 0 ? "red" : "orange";
+            return $@"
+            <tr>
+                <td style='padding:8px;border:1px solid #ddd'>
+                    {item.ProductName}
+                </td>
+                <td style='padding:8px;border:1px solid #ddd'>
+                    {item.SKU}
+                </td>
+                <td style='padding:8px;
+                           border:1px solid #ddd;
+                           text-align:center;
+                           color:{color};
+                           font-weight:bold'>
+                    {item.StockQty}
+                </td>
+            </tr>";
+        }));
 
-            decimal subTotal = items.Sum(i => i.Subtotal);
-            string invoiceNo = $"INV-{orderId:D5}";
+        var html = $@"
+        <div style='font-family:Arial,sans-serif;
+                    max-width:650px;margin:0 auto'>
 
-            await SendInvoiceEmailAsync(toEmail, toName, invoiceNo, subTotal, discountAmount, totalAmount, summaryItems);
-        }
+            <div style='background:#e53935;color:white;
+                        padding:24px;border-radius:8px 8px 0 0'>
+                <h2 style='margin:0'>
+                    ⚠ Low Stock Alert — AutoServe
+                </h2>
+            </div>
 
-        public async Task SendOverdueCreditReminderAsync(string toEmail, string customerName, decimal amountOwed, DateTime dueDate)
-        {
-            var subject = "AutoServe Payment Reminder";
-            var body = $@"<h2>Payment Reminder</h2><p>Dear {customerName},</p><p>You have an outstanding balance of <strong>Rs. {amountOwed:F2}</strong>.</p><p>Original Due Date: {dueDate:dd MMM yyyy}</p><p>Please visit our service center to settle your payment.</p>";
-            await SendAsync(toEmail, customerName, subject, body);
-        }
+            <div style='padding:24px;
+                        border:1px solid #ddd;
+                        border-top:none'>
 
-        public async Task SendLowStockAlertAsync(string adminEmail, List<LowStockItemDto> lowStockItems)
-        {
-            var subject = "AutoServe Low Stock Alert";
-            var rows = string.Join("", lowStockItems.Select(i => $"<tr><td>{i.ProductId}</td><td>{i.ProductName}</td><td>{i.StockQty}</td></tr>"));
-            var body = $@"<h2>Low Stock Alert</h2><table border='1'><tr><th>ID</th><th>Part</th><th>Stock</th></tr>{rows}</table>";
-            await SendAsync(adminEmail, "Admin", subject, body);
-        }
+                <p>The following <strong>{items.Count}</strong>
+                   item(s) are running low on stock
+                   (threshold: 10 units):</p>
+
+                <table style='width:100%;
+                              border-collapse:collapse;
+                              margin:16px 0'>
+                    <thead>
+                        <tr style='background:#f5f5f5'>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:left'>
+                                Product
+                            </th>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:left'>
+                                SKU
+                            </th>
+                            <th style='padding:8px;
+                                       border:1px solid #ddd;
+                                       text-align:center'>
+                                Stock Qty
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>{itemRows}</tbody>
+                </table>
+
+                <p>Please restock as soon as possible.</p>
+                <hr>
+                <p style='color:#888;font-size:0.85em'>
+                    AutoServe Auto Parts — Nepal
+                </p>
+            </div>
+        </div>";
+
+        await SendAsync(
+            adminEmail,
+            "⚠ Low Stock Alert — AutoServe",
+            html);
+    }
+
+    // ── Send Overdue Credit Reminder ───────────────────────────────────
+    public async Task SendOverdueCreditReminderAsync(
+        string   toEmail,
+        string   customerName,
+        decimal  totalOwed,
+        DateTime earliestDueDate)
+    {
+        var daysOverdue =
+            (int)(DateTime.UtcNow - earliestDueDate).TotalDays;
+
+        var html = $@"
+        <div style='font-family:Arial,sans-serif;
+                    max-width:650px;margin:0 auto'>
+
+            <div style='background:#f57c00;color:white;
+                        padding:24px;border-radius:8px 8px 0 0'>
+                <h2 style='margin:0'>
+                    Payment Reminder — AutoServe
+                </h2>
+            </div>
+
+            <div style='padding:24px;
+                        border:1px solid #ddd;
+                        border-top:none'>
+
+                <p>Dear <strong>{customerName}</strong>,</p>
+                <p>You have an outstanding balance
+                   with AutoServe Auto Parts.</p>
+
+                <table style='width:100%;
+                              border-collapse:collapse;
+                              margin:16px 0'>
+                    <tr style='background:#fff8e1'>
+                        <td style='padding:12px;
+                                   border:1px solid #ddd;
+                                   font-weight:bold'>
+                            Amount Owed
+                        </td>
+                        <td style='padding:12px;
+                                   border:1px solid #ddd;
+                                   font-size:1.2em;
+                                   color:#e53935;
+                                   font-weight:bold'>
+                            Rs. {totalOwed:F2}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style='padding:12px;
+                                   border:1px solid #ddd;
+                                   font-weight:bold'>
+                            Overdue Since
+                        </td>
+                        <td style='padding:12px;
+                                   border:1px solid #ddd'>
+                            {earliestDueDate:dd MMM yyyy}
+                            ({daysOverdue} days ago)
+                        </td>
+                    </tr>
+                </table>
+
+                <p>Please visit our store or contact us
+                   to settle your balance.</p>
+                <p><strong>Contact:</strong> 9800000000</p>
+                <hr>
+                <p style='color:#888;font-size:0.85em'>
+                    AutoServe Auto Parts — Nepal
+                </p>
+            </div>
+        </div>";
+
+        await SendAsync(
+            toEmail,
+            "Payment Reminder — AutoServe Auto Parts",
+            html);
     }
 }

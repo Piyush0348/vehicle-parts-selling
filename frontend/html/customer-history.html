@@ -8,43 +8,13 @@
     <link rel="stylesheet" href="../css/customer-portal.css">
 </head>
 <body>
-    <nav class="portal-nav">
-        <div class="portal-nav-shell">
-            <a class="portal-brand" href="index.html">
-                <span class="portal-brand-mark">AS</span>
-                <span class="portal-brand-text">
-                    <span class="portal-brand-title">AutoServe</span>
-                    <span class="portal-brand-subtitle">Customer Portal</span>
-                </span>
-            </a>
-
-            <div class="portal-nav-links">
-                <a class="portal-nav-link" href="index.html">Home</a>
-                <a class="portal-nav-link" href="appointments.html">Appointments</a>
-                <a class="portal-nav-link" href="part-requests.html">Part Requests</a>
-                <a class="portal-nav-link" href="reviews.html">Reviews</a>
-                <a class="portal-nav-link active" href="customer-history.html">History</a>
-                <a class="portal-nav-link" href="ai-prediction.html">AI Prediction</a>
-                <a class="portal-nav-link" href="profile.html">Profile</a>
-                <span class="portal-role-badge role-customer">Customer</span>
-                <a class="portal-nav-logout" href="login.html">Logout</a>
-            </div>
-        </div>
-    </nav>
+    <nav></nav>
 
     <main>
         <header>
             <h1>Purchase &amp; Service History</h1>
-            <input
-                type="number"
-                id="customer-id-input"
-                placeholder="Enter Customer ID"
-                min="1"
-            >
-            <button id="load-history-btn" type="button">View History</button>
         </header>
 
-        <!-- Customer profile strip -->
         <section id="customer-info-section">
             <div id="customer-info-card">
                 <div id="customer-avatar"></div>
@@ -78,13 +48,15 @@
             </div>
         </section>
 
-        <!-- Tab bar -->
         <div id="tab-bar">
-            <button class="tab-btn active" id="tab-purchases" type="button">Purchase History</button>
-            <button class="tab-btn" id="tab-vehicles" type="button">Vehicles &amp; Services</button>
+            <button class="tab-btn active" id="tab-purchases" type="button">
+                Purchase History
+            </button>
+            <button class="tab-btn" id="tab-vehicles" type="button">
+                Vehicles &amp; Services
+            </button>
         </div>
 
-        <!-- Purchase history panel -->
         <section id="purchases-section">
             <table id="purchases-table">
                 <thead>
@@ -102,7 +74,6 @@
             <p id="no-purchases-msg">No purchase history found.</p>
         </section>
 
-        <!-- Order items detail panel (shown when a row is expanded) -->
         <section id="order-detail-section">
             <h2>Order <span id="order-detail-id"></span> — Items</h2>
             <table>
@@ -119,13 +90,11 @@
             <button id="close-detail-btn" type="button">← Back to Orders</button>
         </section>
 
-        <!-- Vehicles + services panel -->
         <section id="vehicles-section">
             <div id="vehicle-list"></div>
             <p id="no-vehicles-msg">No vehicles registered.</p>
         </section>
 
-        <!-- Error message -->
         <p id="error-msg"></p>
         <p id="success-msg"></p>
     </main>

@@ -239,4 +239,31 @@ public class ProductsController : ControllerBase
             .ToListAsync();
         return Ok(data);
     }
+
+    [HttpPost("restock")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Restock([FromBody] RestockDto dto)
+    {
+        if (dto == null || dto.Items == null || !dto.Items.Any())
+            return BadRequest(new { message = "Restock items are required." });
+
+        var supplier = await _context.Suppliers.FindAsync(dto.SupplierId);
+        if (supplier == null)
+            return BadRequest(new { message = $"Supplier with ID {dto.SupplierId} not found." });
+
+        foreach (var item in dto.Items)
+        {
+            var product = await _context.Products.FindAsync(item.ProductId);
+            if (product == null)
+                return BadRequest(new { message = $"Product with ID {item.ProductId} not found." });
+
+            if (product.SupplierId != dto.SupplierId)
+                return BadRequest(new { message = $"Product '{product.Name}' does not belong to supplier '{supplier.Name}'." });
+
+            product.StockQty += item.Quantity;
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Stock updated successfully from purchase invoice." });
+    }
 }

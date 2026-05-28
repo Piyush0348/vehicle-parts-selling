@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoServe | Financial Reports</title>
+    <meta name="description" content="Admin financial reports — view daily, monthly and yearly revenue summaries.">
+    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        .reports-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+        .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+        .stat-card .stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; }
+        .stat-card .stat-value { font-size: 1.7rem; font-weight: 800; color: #0f172a; }
+        .stat-card .stat-sub { font-size: 0.8rem; color: #64748b; }
+        .report-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; }
+        .report-controls label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.8rem; font-weight: 600; color: #475569; }
+        .report-controls input, .report-controls select { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; color: #1e293b; background: #f8fafc; }
+        .tab-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0; }
+        .tab-btn { padding: 0.6rem 1.25rem; font-size: 0.85rem; font-weight: 600; border: none; background: none; color: #94a3b8; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+        .breakdown-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .breakdown-table th { text-align: left; padding: 0.6rem 0.75rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
+        .breakdown-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .breakdown-table tr:hover td { background: #f8fafc; }
+        .bar-cell { width: 180px; }
+        .bar-wrap { background: #f1f5f9; border-radius: 6px; overflow: hidden; height: 10px; }
+        .bar-fill { height: 10px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 6px; transition: width 0.4s ease; }
+        #report-panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.5rem; }
+        #report-error { color: #ef4444; font-size: 0.85rem; margin-top: 0.75rem; }
+        #loading-msg { color: #94a3b8; font-size: 0.9rem; margin: 1.5rem 0; }
+    </style>
+</head>
+<body>
+
+<nav></nav>
+<script type="module" src="../js/navbar.js"></script>
+
+<main>
+    <header>
+        <h1>Financial Reports</h1>
+        <p style="color:#64748b; margin-top:0.25rem; font-size:0.95rem;">Revenue and sales analysis across daily, monthly, and yearly views.</p>
+    </header>
+
+    <!-- Summary Cards -->
+    <div class="reports-grid" id="summary-cards">
+        <div class="stat-card">
+            <span class="stat-label">Today's Revenue</span>
+            <span class="stat-value" id="s-today-rev">—</span>
+            <span class="stat-sub" id="s-today-orders">— orders</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">This Month</span>
+            <span class="stat-value" id="s-month-rev">—</span>
+            <span class="stat-sub" id="s-month-orders">— orders</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">This Year</span>
+            <span class="stat-value" id="s-year-rev">—</span>
+            <span class="stat-sub" id="s-year-orders">— orders</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">All Time</span>
+            <span class="stat-value" id="s-all-rev">—</span>
+            <span class="stat-sub" id="s-all-orders">— orders</span>
+        </div>
+    </div>
+
+    <!-- Tab Selector -->
+    <div class="tab-row">
+        <button class="tab-btn active" id="tab-daily" data-tab="daily">Daily</button>
+        <button class="tab-btn" id="tab-monthly" data-tab="monthly">Monthly</button>
+        <button class="tab-btn" id="tab-yearly" data-tab="yearly">Yearly</button>
+    </div>
+
+    <!-- Report Panel -->
+    <div id="report-panel">
+        <!-- Daily controls -->
+        <div id="controls-daily" class="report-controls">
+            <label>Date
+                <input type="date" id="daily-date">
+            </label>
+            <button class="btn" id="load-daily-btn">Load Report</button>
+        </div>
+
+        <!-- Monthly controls -->
+        <div id="controls-monthly" class="report-controls" style="display:none">
+            <label>Year
+                <input type="number" id="monthly-year" value="2026" min="2020" max="2100" style="width:90px">
+            </label>
+            <label>Month
+                <select id="monthly-month">
+                    <option value="1">January</option><option value="2">February</option>
+                    <option value="3">March</option><option value="4">April</option>
+                    <option value="5">May</option><option value="6">June</option>
+                    <option value="7">July</option><option value="8">August</option>
+                    <option value="9">September</option><option value="10">October</option>
+                    <option value="11">November</option><option value="12">December</option>
+                </select>
+            </label>
+            <button class="btn" id="load-monthly-btn">Load Report</button>
+        </div>
+
+        <!-- Yearly controls -->
+        <div id="controls-yearly" class="report-controls" style="display:none">
+            <label>Year
+                <input type="number" id="yearly-year" value="2026" min="2020" max="2100" style="width:90px">
+            </label>
+            <button class="btn" id="load-yearly-btn">Load Report</button>
+        </div>
+
+        <p id="loading-msg" style="display:none">Loading report...</p>
+        <p id="report-error" style="display:none"></p>
+
+        <!-- Result -->
+        <div id="report-result" style="display:none">
+            <div class="reports-grid" style="margin-bottom:1.5rem">
+                <div class="stat-card"><span class="stat-label">Total Orders</span><span class="stat-value" id="r-orders">—</span></div>
+                <div class="stat-card"><span class="stat-label">Total Revenue</span><span class="stat-value" id="r-revenue">—</span></div>
+                <div class="stat-card"><span class="stat-label">Total Discount</span><span class="stat-value" id="r-discount">—</span></div>
+                <div class="stat-card"><span class="stat-label">Net Revenue</span><span class="stat-value" id="r-net">—</span></div>
+            </div>
+            <div id="breakdown-section"></div>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+import API from "../js/api.js";
+import Auth from "../js/auth.js";
+
+if (!Auth.isAuthenticated() || Auth.getRole() !== "Admin") {
+    window.location.href = "login.html";
+}
+
+const fmt = (n) => `Rs. ${Number(n || 0).toFixed(2)}`;
+const loading = document.getElementById("loading-msg");
+const errorEl = document.getElementById("report-error");
+const resultEl = document.getElementById("report-result");
+
+// Set today's date as default
+const today = new Date();
+document.getElementById("daily-date").value = today.toISOString().split("T")[0];
+document.getElementById("monthly-month").value = today.getMonth() + 1;
+
+// Load summary cards
+async function loadSummary() {
+    try {
+        const s = await API.get("/reports/summary");
+        document.getElementById("s-today-rev").textContent = fmt(s.today.revenue);
+        document.getElementById("s-today-orders").textContent = `${s.today.orders} orders`;
+        document.getElementById("s-month-rev").textContent = fmt(s.thisMonth.revenue);
+        document.getElementById("s-month-orders").textContent = `${s.thisMonth.orders} orders`;
+        document.getElementById("s-year-rev").textContent = fmt(s.thisYear.revenue);
+        document.getElementById("s-year-orders").textContent = `${s.thisYear.orders} orders`;
+        document.getElementById("s-all-rev").textContent = fmt(s.allTime.revenue);
+        document.getElementById("s-all-orders").textContent = `${s.allTime.orders} orders`;
+    } catch (e) {
+        console.error("Summary failed", e);
+    }
+}
+loadSummary();
+
+// Tabs
+let activeTab = "daily";
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeTab = btn.dataset.tab;
+        ["daily", "monthly", "yearly"].forEach(t => {
+            document.getElementById(`controls-${t}`).style.display = t === activeTab ? "flex" : "none";
+        });
+        resultEl.style.display = "none";
+    });
+});
+
+function showResult(data, breakdown, labelKey, valueKey) {
+    document.getElementById("r-orders").textContent = data.totalOrders;
+    document.getElementById("r-revenue").textContent = fmt(data.totalRevenue);
+    document.getElementById("r-discount").textContent = fmt(data.totalDiscount);
+    document.getElementById("r-net").textContent = fmt(data.netRevenue);
+
+    const section = document.getElementById("breakdown-section");
+    if (!breakdown || breakdown.length === 0) {
+        section.innerHTML = `<p style="color:#94a3b8; font-size:0.9rem;">No breakdown data available.</p>`;
+    } else {
+        const maxRev = Math.max(...breakdown.map(b => b.revenue), 1);
+        section.innerHTML = `
+            <h3 style="font-size:0.95rem; font-weight:700; color:#334155; margin-bottom:0.75rem;">Breakdown</h3>
+            <table class="breakdown-table">
+                <thead><tr>
+                    <th>${labelKey}</th>
+                    <th>Orders</th>
+                    <th>Revenue</th>
+                    <th class="bar-cell">Chart</th>
+                </tr></thead>
+                <tbody>
+                    ${breakdown.map(b => `
+                        <tr>
+                            <td>${b[labelKey] || b.day || b.monthName || b.month}</td>
+                            <td>${b.orders}</td>
+                            <td>${fmt(b.revenue)}</td>
+                            <td class="bar-cell">
+                                <div class="bar-wrap">
+                                    <div class="bar-fill" style="width:${Math.round((b.revenue / maxRev) * 100)}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>`;
+    }
+    resultEl.style.display = "block";
+}
+
+// Load Daily
+document.getElementById("load-daily-btn").addEventListener("click", async () => {
+    const date = document.getElementById("daily-date").value;
+    loading.style.display = "block";
+    errorEl.style.display = "none";
+    resultEl.style.display = "none";
+    try {
+        const data = await API.get(`/reports/daily?date=${date}`);
+        loading.style.display = "none";
+        showResult(data, [], "day", "revenue");
+        document.getElementById("breakdown-section").innerHTML = `<p style="color:#64748b; font-size:0.9rem;">Date: <strong>${data.date}</strong></p>`;
+        resultEl.style.display = "block";
+    } catch (e) {
+        loading.style.display = "none";
+        errorEl.textContent = "Failed to load daily report.";
+        errorEl.style.display = "block";
+    }
+});
+
+// Load Monthly
+document.getElementById("load-monthly-btn").addEventListener("click", async () => {
+    const year = document.getElementById("monthly-year").value;
+    const month = document.getElementById("monthly-month").value;
+    loading.style.display = "block";
+    errorEl.style.display = "none";
+    resultEl.style.display = "none";
+    try {
+        const data = await API.get(`/reports/monthly?year=${year}&month=${month}`);
+        loading.style.display = "none";
+        showResult(data, data.dailyBreakdown, "day", "revenue");
+    } catch (e) {
+        loading.style.display = "none";
+        errorEl.textContent = "Failed to load monthly report.";
+        errorEl.style.display = "block";
+    }
+});
+
+// Load Yearly
+document.getElementById("load-yearly-btn").addEventListener("click", async () => {
+    const year = document.getElementById("yearly-year").value;
+    loading.style.display = "block";
+    errorEl.style.display = "none";
+    resultEl.style.display = "none";
+    try {
+        const data = await API.get(`/reports/yearly?year=${year}`);
+        loading.style.display = "none";
+        showResult(data, data.monthlyBreakdown, "monthName", "revenue");
+    } catch (e) {
+        loading.style.display = "none";
+        errorEl.textContent = "Failed to load yearly report.";
+        errorEl.style.display = "block";
+    }
+});
+</script>
+</body>
+</html>

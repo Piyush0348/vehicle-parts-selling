@@ -71,3 +71,16 @@ public class BulkPriceUpdateDto
     public int ProductId { get; set; }
     public decimal NewPrice { get; set; }
 }
+
+public class RestockItemDto
+{
+    public int ProductId { get; set; }
+    public int Quantity { get; set; }
+    public decimal Cost { get; set; }
+}
+
+public class RestockDto
+{
+    public int SupplierId { get; set; }
+    public List<RestockItemDto> Items { get; set; } = new();
+}
