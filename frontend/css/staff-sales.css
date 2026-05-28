@@ -18,6 +18,77 @@ nav {
     padding: 15px 30px;
     font-size: 1.1em;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+nav .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+nav .nav-role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-right: 4px;
+}
+
+nav .nav-role-admin {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+nav .nav-role-staff {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+nav .nav-role-customer {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+nav .nav-link {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+nav .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+nav .nav-logout-btn {
+    padding: 7px 16px;
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+nav .nav-logout-btn:hover {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
 }
 
 main {

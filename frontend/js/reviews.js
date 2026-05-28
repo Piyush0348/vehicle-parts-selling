@@ -1,3 +1,5 @@
+import RBAC from "./rbac.js";
+
 const CONFIG = Object.freeze({
     API_BASE: "http://localhost:5033/api",
     REVIEWS_URL: "http://localhost:5033/api/reviews",
@@ -44,9 +46,13 @@ const starsHtml = (rating) =>
         .reduce((html, star) => html + star, "");
 
 const createFetcher = (method) => async (url, body = null) => {
+    const token = RBAC.getToken();
     const options = {
         method,
-        headers: { "Content-Type": "application/json" }
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": "Bearer " + token } : {})
+        }
     };
     if (body !== null) options.body = JSON.stringify(body);
 
@@ -299,6 +305,16 @@ const bindEvents = () => {
 
 const init = () => {
     bindEvents();
+
+    const userId = Number(RBAC.getUserId());
+    const role = RBAC.getUserRole();
+
+    if (Number.isInteger(userId) && userId > 0 && role === "Customer") {
+        dom.customerIdInput.value = String(userId);
+        dom.customerIdInput.readOnly = true;
+        dom.customerIdInput.placeholder = "Signed-in customer";
+    }
+
     api.getAll().then(renderReviews).catch(() => {});
 };
 

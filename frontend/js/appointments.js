@@ -1,3 +1,5 @@
+import RBAC from "./rbac.js";
+
 const CONFIG = Object.freeze({
     APPOINTMENTS_URL: "http://localhost:5033/api/appointments",
     CUSTOMER_APPOINTMENTS: function(id) { return "http://localhost:5033/api/appointments/customer/" + id; },
@@ -30,6 +32,11 @@ const dom = Object.freeze({
 var currentCustomerId = null;
 var currentVehicles = [];
 var deleteTargetId = null;
+
+function getAuthHeaders() {
+    var token = RBAC.getToken();
+    return token ? { "Authorization": "Bearer " + token } : {};
+}
 
 function formatDate(isoString) {
     var d = new Date(isoString);
@@ -104,7 +111,7 @@ function populateVehicles(vehicles) {
 
 function loadAll() {
     clearError();
-    fetch(CONFIG.APPOINTMENTS_URL)
+    fetch(CONFIG.APPOINTMENTS_URL, { headers: getAuthHeaders() })
         .then(function(res) { return res.json(); })
         .then(function(data) {
             renderTable(data);
@@ -126,13 +133,13 @@ function loadByCustomer() {
     dom.loadBtn.disabled = true;
     dom.loadBtn.textContent = "Loading...";
 
-    fetch(CONFIG.CUSTOMER_DETAIL(customerId))
+    fetch(CONFIG.CUSTOMER_DETAIL(customerId), { headers: getAuthHeaders() })
         .then(function(res) { return res.json(); })
         .then(function(customer) {
             currentCustomerId = customerId;
             currentVehicles = customer.vehicles || [];
             populateVehicles(currentVehicles);
-            return fetch(CONFIG.CUSTOMER_APPOINTMENTS(customerId));
+            return fetch(CONFIG.CUSTOMER_APPOINTMENTS(customerId), { headers: getAuthHeaders() });
         })
         .then(function(res) { return res.json(); })
         .then(function(appointments) {
@@ -176,11 +183,11 @@ function openCreateForm() {
 }
 
 function openEditForm(id) {
-    fetch(CONFIG.APPOINTMENTS_URL + "/" + id)
+    fetch(CONFIG.APPOINTMENTS_URL + "/" + id, { headers: getAuthHeaders() })
         .then(function(res) { return res.json(); })
         .then(function(appointment) {
             if (currentCustomerId !== appointment.customerId || currentVehicles.length === 0) {
-                return fetch(CONFIG.CUSTOMER_DETAIL(appointment.customerId))
+                return fetch(CONFIG.CUSTOMER_DETAIL(appointment.customerId), { headers: getAuthHeaders() })
                     .then(function(res) { return res.json(); })
                     .then(function(customer) {
                         currentCustomerId = appointment.customerId;
@@ -247,7 +254,7 @@ function handleSubmit(e) {
 
     fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: Object.assign({ "Content-Type": "application/json" }, getAuthHeaders()),
         body: JSON.stringify(body)
     })
     .then(function() {
@@ -268,7 +275,7 @@ function handleConfirmYes() {
     dom.confirmDialog.close();
     if (!deleteTargetId) return;
 
-    fetch(CONFIG.APPOINTMENTS_URL + "/" + deleteTargetId, { method: "DELETE" })
+    fetch(CONFIG.APPOINTMENTS_URL + "/" + deleteTargetId, { method: "DELETE", headers: getAuthHeaders() })
         .then(function() {
             deleteTargetId = null;
             loadAll();
@@ -276,6 +283,21 @@ function handleConfirmYes() {
         .catch(function(err) {
             showError("Could not cancel appointment: " + err.message);
         });
+}
+
+function initCustomerContext() {
+    var userId = Number(RBAC.getUserId());
+    var role = RBAC.getUserRole();
+
+    if (Number.isInteger(userId) && userId > 0 && role === "Customer") {
+        dom.customerIdInput.value = String(userId);
+        dom.customerIdInput.readOnly = true;
+        dom.customerIdInput.placeholder = "Signed-in customer";
+        loadByCustomer();
+        return;
+    }
+
+    loadAll();
 }
 
 function handleTableClick(event) {
@@ -301,4 +323,4 @@ dom.tbody.addEventListener("click", handleTableClick);
 dom.confirmYes.addEventListener("click", handleConfirmYes);
 dom.confirmNo.addEventListener("click", function() { dom.confirmDialog.close(); });
 
-loadAll();
+initCustomerContext();

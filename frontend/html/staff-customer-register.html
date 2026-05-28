@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Customer with Vehicles</title>
+    <title>AutoServe Staff — Register Customer</title>
     <link rel="stylesheet" href="../css/customer-register.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
+<nav id="global-nav"></nav>
     <div class="container">
         <header>
             <h1>Customer Registration Form</h1>
@@ -94,6 +102,7 @@
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="spinner hidden"></div>
 
+    <script type="module" src="../js/navbar.js"></script>
     <script src="../js/customer-register.js"></script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import RBAC from "./rbac.js";
+
 const CONFIG = Object.freeze({
     API_BASE: "http://localhost:5033/api",
     REQUESTS_URL: "http://localhost:5033/api/part-requests",
@@ -48,9 +50,13 @@ const statusClass = (status) => {
 };
 
 const createFetcher = (method) => async (url, body = null) => {
+    const token = RBAC.getToken();
     const options = {
         method,
-        headers: { "Content-Type": "application/json" }
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": "Bearer " + token } : {})
+        }
     };
 
     if (body !== null) {
@@ -322,6 +328,18 @@ const bindEvents = () => {
 
 const init = () => {
     bindEvents();
+
+    const userId = Number(RBAC.getUserId());
+    const role = RBAC.getUserRole();
+
+    if (Number.isInteger(userId) && userId > 0 && role === "Customer") {
+        dom.customerIdInput.value = String(userId);
+        dom.customerIdInput.readOnly = true;
+        dom.customerIdInput.placeholder = "Signed-in customer";
+        loadByCustomer(userId);
+        return;
+    }
+
     loadAll();
 };
 

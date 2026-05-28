@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff - Create Sales Invoice</title>
+    <title>AutoServe Staff — Sales Invoice</title>
     <link rel="stylesheet" href="../css/staff-sales.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
-    <nav>
-        <span>Vehicle Parts Staff Portal - Sales</span>
-    </nav>
-
-    <script type="module" src="../js/navbar.js"></script>
+<nav id="global-nav"></nav>
 
     <main>
         <div class="container">
@@ -148,6 +151,7 @@
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="spinner hidden"></div>
 
+    <script type="module" src="../js/navbar.js"></script>
     <script src="../js/staff-sales.js"></script>
 </body>
 </html>

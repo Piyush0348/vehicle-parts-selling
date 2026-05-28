@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Low Stock Alerts</title>
+    <title>AutoServe Admin — Low Stock Alerts</title>
     <link rel="stylesheet" href="../css/admin-low-stock.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
-    <nav>
-        <span>Vehicle Parts Admin</span>
-    </nav>
+<nav id="global-nav"></nav>
 
     <main>
         <header>
@@ -77,6 +82,7 @@
         <p id="error-msg"></p>
     </main>
 
+    <script type="module" src="../js/navbar.js"></script>
     <script src="../js/admin-low-stock.js"></script>
 </body>
 </html>

@@ -9,27 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/staff-search-customer.css">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
-    <!-- Top Modern Navigation -->
-    <nav class="portal-nav">
-        <div class="nav-container">
-            <div class="logo-wrapper">
-                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
-                    <circle cx="7" cy="17" r="2"></circle>
-                    <path d="M9 17h6"></path>
-                    <circle cx="17" cy="17" r="2"></circle>
-                </svg>
-                <span class="logo-text">AutoServe <span class="badge">Staff</span></span>
-            </div>
-            <div class="nav-links">
-                <a href="staff-search-customer.html" class="nav-link active">Customers Directory</a>
-                <a href="staff-sales.html" class="nav-link">Sales & Invoices</a>
-                <a href="product.html" class="nav-link">Inventory</a>
-            </div>
-        </div>
-    </nav>
+<nav id="global-nav"></nav>
 
     <main class="dashboard-main">
         <!-- Dashboard Header -->
@@ -382,6 +369,7 @@
         </div>
     </div>
 
+    <script type="module" src="../js/navbar.js"></script>
     <script src="../js/staff-search-customer.js"></script>
 </body>
 </html>

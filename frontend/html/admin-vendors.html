@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoServe Admin — Vendor Management</title>
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         if (!localStorage.getItem("token")) {
             window.location.href = "login.html";
@@ -13,20 +15,7 @@
 </head>
 <body>
 
-<nav class="admin-nav">
-    <div class="nav-container">
-        <div class="nav-brand">
-            AutoServe <span class="badge">Admin</span>
-        </div>
-        <div class="nav-links">
-            <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
-            <a href="admin-parts.html" class="nav-link">Parts</a>
-            <a href="admin-staff.html" class="nav-link">Staff</a>
-            <a href="admin-vendors.html" class="nav-link active">Vendors</a>
-            <button class="nav-logout-btn" onclick="logout()">Logout</button>
-        </div>
-    </div>
-</nav>
+<nav id="global-nav"></nav>
 
 <main class="admin-main">
 
@@ -142,6 +131,7 @@
 
 <div id="toast" class="toast hidden"></div>
 
+<script type="module" src="../js/navbar.js"></script>
 <script src="../js/admin-vendors.js"></script>
 </body>
 </html>

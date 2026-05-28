@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Manager</title>
+    <title>AutoServe — Parts Inventory</title>
     <link rel="stylesheet" href="../css/product.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
 
-    <!-- ═══ NAV BAR ═══ -->
-    <nav class="navbar">
-        <span class="nav-brand" onclick="showView('list')">Mero Cart</span>
-        <button class="btn btn-primary btn-sm" onclick="openCreateForm()">+ New Product</button>
-    </nav>
+<nav id="global-nav"></nav>
 
     <div class="container">
 
@@ -85,6 +88,7 @@
 
     </div>
 
+    <script type="module" src="../js/navbar.js"></script>
     <script src="../js/product.js"></script>
 </body>
 </html>

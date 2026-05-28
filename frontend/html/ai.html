@@ -1,40 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<script type="module">
-import AI from "../js/ai.js";
-
-window.predict = async () => {
-    const res = await AI.predict(
-        mileage.value,
-        year.value,
-        service.value
-    );
-
-    result.innerText = res.result;
-};
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0; url=ai-prediction.html">
+    <title>AI Prediction</title>
 </head>
-
-<body class="bg-gray-100 flex justify-center items-center h-screen">
-
-<div class="bg-white p-6 rounded shadow w-96">
-
-<h2 class="text-xl font-bold mb-4">AI Prediction</h2>
-
-<input id="mileage" class="border p-2 w-full mb-2" placeholder="Mileage">
-<input id="year" class="border p-2 w-full mb-2" placeholder="Year">
-<input id="service" class="border p-2 w-full mb-4" placeholder="Service Count">
-
-<button onclick="predict()" class="bg-blue-600 text-white w-full py-2 rounded">
-Predict
-</button>
-
-<p id="result" class="mt-4 font-bold"></p>
-
-</div>
-
+<body>
+    <p>Redirecting to AI Prediction...</p>
 </body>
 </html>

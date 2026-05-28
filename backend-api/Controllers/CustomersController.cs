@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using AutoServe.API.DTOs;
 
-[Authorize(Roles = "Admin,Staff")]
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase
@@ -12,6 +12,7 @@ public class CustomersController : ControllerBase
 
     public CustomersController(AppDbContext context) => _context = context;
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 1000)
     {
@@ -45,6 +46,7 @@ public class CustomersController : ControllerBase
         return Ok(customers);
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpGet("reports/summary")]
     public async Task<IActionResult> GetReports()
     {
@@ -71,6 +73,7 @@ public class CustomersController : ControllerBase
         return Ok(report);
     }
 
+    [Authorize(Roles = "Admin,Staff,Customer")]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -102,6 +105,7 @@ public class CustomersController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateCustomerDto dto)
     {
@@ -131,6 +135,7 @@ public class CustomersController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdateCustomerDto dto)
     {
@@ -146,6 +151,7 @@ public class CustomersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -157,6 +163,7 @@ public class CustomersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpGet("staff")]
     public async Task<IActionResult> GetStaff()
     {
@@ -175,6 +182,7 @@ public class CustomersController : ControllerBase
         return Ok(staff);
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpPost("staff")]
     public async Task<IActionResult> CreateStaff(CreateCustomerDto dto)
     {
@@ -197,6 +205,7 @@ public class CustomersController : ControllerBase
         return Ok(new { message = "Staff created successfully" });
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpPut("staff/{id:int}")]
     public async Task<IActionResult> UpdateRole(int id, string role)
     {
@@ -209,6 +218,7 @@ public class CustomersController : ControllerBase
         return Ok(new { message = "Role updated successfully" });
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpDelete("staff/{id:int}")]
     public async Task<IActionResult> DeleteStaff(int id)
     {
@@ -223,6 +233,7 @@ public class CustomersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin,Staff")]
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string? query)
     {
@@ -269,6 +280,7 @@ public class CustomersController : ControllerBase
     /// <summary>
     /// Register new customer with vehicle details
     /// </summary>
+    [AllowAnonymous]
     [HttpPost("register-with-vehicles")]
     public async Task<IActionResult> RegisterWithVehicles([FromBody] CreateCustomerWithVehicleDto dto)
     {
@@ -338,6 +350,7 @@ public class CustomersController : ControllerBase
     /// <summary>
     /// Generate customer reports (regulars, high spenders, pending credits)
     /// </summary>
+    [Authorize(Roles = "Admin,Staff")]
     [HttpGet("reports")]
     public async Task<IActionResult> GetCustomerReports([FromQuery] string type)
     {

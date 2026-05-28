@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Vehicle Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import RBAC from "../js/rbac.js";
+
+        if (!RBAC.isAuthenticated()) {
+            window.location.href = "login.html";
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userNameEl = document.getElementById('user-name');
+            const userRoleEl = document.getElementById('user-role');
+
+            if (userNameEl) userNameEl.textContent = RBAC.getUserName();
+            if (userRoleEl) userRoleEl.textContent = RBAC.getUserRole();
+        });
+    </script>
+</head>
+<body class="bg-slate-100 min-h-screen">
+<nav class="bg-slate-900 text-white px-8 py-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">AutoServe - AI Prediction</h1>
+    <div class="flex gap-6 items-center">
+        <a href="index.html" class="hover:text-blue-400">Home</a>
+        <a href="appointments.html" class="hover:text-blue-400">Appointments</a>
+        <a href="ai-prediction.html" class="text-blue-400">AI Prediction</a>
+        <a href="profile.html" class="hover:text-blue-400">Profile</a>
+        <div class="border-l border-slate-700 pl-4">
+            <span class="text-sm text-slate-300">Welcome: <strong id="user-name">User</strong></span>
+            <span class="text-xs text-slate-400 ml-2">(<strong id="user-role">Customer</strong>)</span>
+        </div>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</button>
+    </div>
+</nav>
+
+<section class="max-w-7xl mx-auto py-10 px-6">
+    <div class="mb-10">
+        <h2 class="text-4xl font-bold text-slate-800 mb-3">Predict Vehicle Problems Using AI</h2>
+        <p class="text-slate-500 text-lg">Analyze vehicle condition based on mileage, service history, engine health, and battery performance.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="font-semibold text-slate-700">Mileage (KM)</label>
+                <input id="mileage" type="number" placeholder="Enter mileage" class="w-full border border-slate-300 rounded-xl p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="font-semibold text-slate-700">Vehicle Year</label>
+                <input id="year" type="number" placeholder="2020" class="w-full border border-slate-300 rounded-xl p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="font-semibold text-slate-700">Months Since Last Service</label>
+                <input id="lastServiceMonths" type="number" placeholder="6" class="w-full border border-slate-300 rounded-xl p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="font-semibold text-slate-700">Engine Health (%)</label>
+                <input id="engineHealth" type="number" placeholder="80" class="w-full border border-slate-300 rounded-xl p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="font-semibold text-slate-700">Battery Health (%)</label>
+                <input id="batteryHealth" type="number" placeholder="75" class="w-full border border-slate-300 rounded-xl p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <button onclick="predictFailure()" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-lg shadow-md">Predict Now</button>
+    </div>
+
+    <div id="predictionBox" class="hidden bg-white rounded-2xl shadow-lg p-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-slate-800">Prediction Result</h2>
+                <p class="text-slate-500 mt-2">AI-based vehicle health analysis</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <span id="riskLevel" class="px-5 py-3 rounded-full text-white font-semibold"></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-slate-100 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold text-slate-700">Vehicle Age</h3>
+                <p id="vehicleAge" class="text-3xl font-bold text-blue-600 mt-2"></p>
+            </div>
+            <div class="bg-slate-100 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold text-slate-700">Risk Score</h3>
+                <p id="riskScore" class="text-3xl font-bold text-red-500 mt-2"></p>
+            </div>
+            <div class="bg-slate-100 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold text-slate-700">Service Status</h3>
+                <p id="serviceRecommendation" class="text-xl font-bold text-green-600 mt-2"></p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Brake Condition</h3>
+                <p id="brakeCondition" class="text-slate-600"></p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Engine Condition</h3>
+                <p id="engineCondition" class="text-slate-600"></p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Battery Condition</h3>
+                <p id="batteryCondition" class="text-slate-600"></p>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Recommended Parts</h2>
+            <div id="recommendedParts" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </div>
+    </div>
+</section>
+
+<script type="module">
+    import AI from "../js/ai.js";
+    import RBAC from "../js/rbac.js";
+
+    window.predictFailure = async function () {
+        try {
+            const mileage = document.getElementById("mileage").value;
+            const year = document.getElementById("year").value;
+            const lastServiceMonths = document.getElementById("lastServiceMonths").value;
+            const engineHealth = document.getElementById("engineHealth").value;
+            const batteryHealth = document.getElementById("batteryHealth").value;
+
+            if (!mileage || !year || !lastServiceMonths || !engineHealth || !batteryHealth) {
+                alert("Please fill all fields");
+                return;
+            }
+
+            const result = await AI.predict(mileage, year, lastServiceMonths, engineHealth, batteryHealth);
+
+            document.getElementById("predictionBox").classList.remove("hidden");
+
+            const riskLevel = document.getElementById("riskLevel");
+            riskLevel.innerText = result.riskLevel;
+            if (result.riskLevel.includes("High")) {
+                riskLevel.className = "bg-red-500 text-white px-5 py-3 rounded-full font-semibold";
+            } else if (result.riskLevel.includes("Medium")) {
+                riskLevel.className = "bg-yellow-500 text-white px-5 py-3 rounded-full font-semibold";
+            } else {
+                riskLevel.className = "bg-green-500 text-white px-5 py-3 rounded-full font-semibold";
+            }
+
+            document.getElementById("vehicleAge").innerText = result.vehicleAge + " Years";
+            document.getElementById("riskScore").innerText = result.riskScore;
+            document.getElementById("serviceRecommendation").innerText = result.nextServiceRecommendation;
+            document.getElementById("brakeCondition").innerText = result.predictions.brakeCondition;
+            document.getElementById("engineCondition").innerText = result.predictions.engineCondition;
+            document.getElementById("batteryCondition").innerText = result.predictions.batteryCondition;
+
+            const partsContainer = document.getElementById("recommendedParts");
+            partsContainer.innerHTML = "";
+            result.recommendedParts.forEach(part => {
+                partsContainer.innerHTML += `
+                    <div class="bg-slate-100 rounded-xl p-5 shadow">
+                        <h3 class="text-xl font-bold text-slate-800">${part}</h3>
+                        <p class="text-slate-500 mt-2">Recommended by AI analysis</p>
+                        <a href="product.html" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">View Parts</a>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error(error);
+            alert("Prediction failed");
+        }
+    };
+
+    window.logout = function () {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        window.location.href = "login.html";
+    };
+
+    const userNameEl = document.getElementById('user-name');
+    const userRoleEl = document.getElementById('user-role');
+    if (userNameEl) userNameEl.textContent = RBAC.getUserName();
+    if (userRoleEl) userRoleEl.textContent = RBAC.getUserRole();
+</script>
+<script type="module" src="../js/navbar.js"></script>
+</body>
+</html>

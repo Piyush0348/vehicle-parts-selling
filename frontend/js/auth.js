@@ -26,7 +26,7 @@ const Auth = {
         else if (role === "Staff")
             window.location = "../html/staff-search-customer.html";
         else
-            window.location = "../html/customer-register.html";
+            window.location = "../html/index.html";
     },
 
     logout() {

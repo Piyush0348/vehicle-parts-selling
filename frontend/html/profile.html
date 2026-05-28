@@ -1,48 +1,168 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="css/style.css">
-<script src="../js/app.js"></script>
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Profile | AutoServe</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module">
+    import RBAC from "../js/rbac.js";
 
-<div class="container">
-    <h2>Profile</h2>
+    if (!RBAC.isAuthenticated()) {
+        window.location.href = "login.html";
+    }
 
-    <input id="fname">
-    <input id="lname">
-    <input id="phone">
+    document.addEventListener('DOMContentLoaded', () => {
+        const userNameEl = document.getElementById('user-name');
+        const userRoleEl = document.getElementById('user-role');
 
-    <button onclick="update()">Update</button>
-</div>
-
-<script>
-function loadProfile() {
-    fetch(API + "/customers/1", {
-        headers: authHeader()
-    })
-    .then(res => res.json())
-    .then(data => {
-        fname.value = data.firstName;
-        lname.value = data.lastName;
-        phone.value = data.phone;
+        if (userNameEl) userNameEl.textContent = RBAC.getUserName();
+        if (userRoleEl) userRoleEl.textContent = RBAC.getUserRole();
     });
+</script>
+</head>
+<body class="bg-slate-50 antialiased font-sans">
+<nav class="bg-slate-900 text-white px-8 py-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">AutoServe</h1>
+    <div class="flex gap-6 items-center">
+        <a href="index.html" class="hover:text-blue-400">Home</a>
+        <a href="appointments.html" class="hover:text-blue-400">Appointments</a>
+        <a href="ai-prediction.html" class="hover:text-blue-400">AI Prediction</a>
+        <a href="profile.html" class="text-blue-400">Profile</a>
+        <div class="border-l border-slate-700 pl-4">
+            <span class="text-sm text-slate-300">Welcome: <strong id="user-name">User</strong></span>
+            <span class="text-xs text-slate-400 ml-2">(<strong id="user-role">Customer</strong>)</span>
+        </div>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">Logout</button>
+    </div>
+</nav>
+<main class="max-w-5xl mx-auto py-10 px-4 sm:px-6">
+    <header class="mb-8">
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Account Settings</h1>
+        <p class="text-slate-500 mt-1 text-sm">Manage your public profile information and contact details.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 text-center sticky top-24">
+                <div class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4 shadow-md shadow-blue-200">
+                    <span id="avatar-initials">U</span>
+                </div>
+                <h3 id="summary-name" class="text-lg font-bold text-slate-800 truncate">Customer Profile</h3>
+                <p id="summary-email" class="text-sm text-slate-500 truncate mb-4">loading...</p>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Active Customer
+                </span>
+            </div>
+        </div>
+
+        <div class="md:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-800">Personal Information</h2>
+                    <span class="text-xs text-slate-400" id="profile-id">ID: #0000</span>
+                </div>
+
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label for="fname" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">First Name</label>
+                            <input type="text" id="fname" placeholder="John" class="w-full px-4 py-2.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-600 rounded-xl outline-none transition text-slate-800 text-sm font-medium shadow-inner">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label for="lname" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Last Name</label>
+                            <input type="text" id="lname" placeholder="Doe" class="w-full px-4 py-2.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-600 rounded-xl outline-none transition text-slate-800 text-sm font-medium shadow-inner">
+                        </div>
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Email Address</label>
+                            <input type="email" id="email" placeholder="john.doe@example.com" class="w-full px-4 py-2.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-600 rounded-xl outline-none transition text-slate-800 text-sm font-medium shadow-inner">
+                        </div>
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="phone" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Phone Number</label>
+                            <input type="text" id="phone" placeholder="+1 (555) 000-0000" class="w-full px-4 py-2.5 bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-600 rounded-xl outline-none transition text-slate-800 text-sm font-medium shadow-inner">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                    <button type="button" onclick="loadProfile()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 rounded-xl border border-slate-200 transition">Cancel</button>
+                    <button id="updateBtn" class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.98] rounded-xl transition shadow-sm shadow-blue-100">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+import API from "../js/api.js";
+import RBAC from "../js/rbac.js";
+
+const customerId = RBAC.getUserId();
+
+const fname = document.getElementById("fname");
+const lname = document.getElementById("lname");
+const email = document.getElementById("email");
+const phone = document.getElementById("phone");
+const summaryName = document.getElementById("summary-name");
+const summaryEmail = document.getElementById("summary-email");
+const avatarInitials = document.getElementById("avatar-initials");
+const profileId = document.getElementById("profile-id");
+
+async function loadProfile() {
+    try {
+        const data = await API.get(`/profile/me`);
+        fname.value = data.firstName || "";
+        lname.value = data.lastName || "";
+        email.value = data.email || "";
+        phone.value = data.phone || "";
+
+        const first = data.firstName || "";
+        const last = data.lastName || "";
+        summaryName.textContent = (first || last) ? `${first} ${last}` : "No Name Provided";
+        summaryEmail.textContent = data.email || "No Email Provided";
+        avatarInitials.textContent = ((first[0] || "") + (last[0] || "U")).toUpperCase();
+        profileId.textContent = `ID: #${customerId || "0000"}`;
+    } catch (err) {
+        console.error(err);
+        alert("Failed to load profile");
+    }
 }
 
-function update() {
-    fetch(API + "/customers/1", {
-        method: "PUT",
-        headers: authHeader(),
-        body: JSON.stringify({
+async function updateProfile() {
+    const btn = document.getElementById("updateBtn");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+        await API.put(`/profile/me`, {
             firstName: fname.value,
             lastName: lname.value,
+            email: email.value,
             phone: phone.value
-        })
-    }).then(() => alert("Updated"));
+        });
+        alert("Profile updated successfully");
+        await loadProfile();
+    } catch (err) {
+        console.error(err);
+        alert("Failed to update profile");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Save Changes";
+    }
 }
 
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.location.href = "login.html";
+}
+
+window.logout = logout;
+window.loadProfile = loadProfile;
+document.getElementById("updateBtn").addEventListener("click", updateProfile);
 loadProfile();
 </script>
-
+<script type="module" src="../js/navbar.js"></script>
 </body>
 </html>

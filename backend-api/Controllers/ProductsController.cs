@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using AutoServe.API.DTOs;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Staff")]
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -74,6 +74,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateProductDto dto)
     {
         var category = await _context.Categories.FindAsync(dto.CategoryId);
@@ -109,6 +110,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, UpdateProductDto dto)
     {
         var product = await _context.Products.FindAsync(id);
@@ -126,6 +128,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var product = await _context.Products.FindAsync(id);
@@ -137,6 +140,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost("bulk")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> BulkInsert(List<CreateProductDto> dtos)
     {
         var products = dtos.Select(dto => new Product
@@ -195,6 +199,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("bulk-update-price")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> BulkUpdatePrice(List<BulkPriceUpdateDto> updates)
     {
         var ids = updates.Select(x => x.ProductId).ToList();

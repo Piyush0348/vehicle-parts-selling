@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff - Customer Details</title>
+    <title>AutoServe Staff — Customer Details</title>
     <link rel="stylesheet" href="../css/staff-customer-detail.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
-    <nav>
-        <span>Vehicle Parts Staff Portal</span>
-    </nav>
-
-    <script type="module" src="../js/navbar.js"></script>
+<nav id="global-nav"></nav>
 
     <main>
         <header>
@@ -125,6 +128,7 @@
         <div id="alertMessage" class="alert hidden"></div>
     </main>
 
+    <script type="module" src="../js/navbar.js"></script>
     <script src="../js/staff-customer-detail.js"></script>
 </body>
 </html>
